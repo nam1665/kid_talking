@@ -262,13 +262,15 @@ class Results extends React.PureComponent {
         }
         else {
           this.setState({
-            speech_result_final: recognized
+            speech_result_final: recognized,
+            speech_status: 'speech sent'
           })
           this.send(recognized);
         }
       }else{
         this.setState({
-          speech_result: recognized
+          speech_result: recognized,
+          speech_status: 'not stopped yet'
         })
         console.log(recognized)
 
@@ -396,8 +398,7 @@ class Results extends React.PureComponent {
 
       <div className="lesson_copy" style={divStyle}>
         <div className="">
-          <div className="title">Realtime debug: {this.state.speech_result}</div>
-          <div className="title">NLP Processed: {this.state.speech_result_final}</div>
+        <div className="title">Speak Status: {this.state.speech_status}</div>
         </div>
       </div>
 
