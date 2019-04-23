@@ -75,7 +75,7 @@ class Layout extends React.PureComponent {
     this.startAssistant();
 
     //trigger dialogflow for starter test
-    this.send(pronun_start);
+    this.send(starter_triger);
 
   }
 
@@ -339,10 +339,6 @@ class Layout extends React.PureComponent {
     var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
     this.postData(url_api, fd, 'FormData')
       .then(data => {
-
-        if(data.text_score.quality_score === 'undefined'){
-          score = Math.floor(Math.random() * 100) + 70;
-        }
 
         let score = data.text_score.quality_score;
 
