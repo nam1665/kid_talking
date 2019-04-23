@@ -1,0 +1,2 @@
+export const COMMON_INIT = 'COMMON_INIT';
+export const COMMON_INIT_SUCCESS = 'COMMON_INIT_SUCCESS';

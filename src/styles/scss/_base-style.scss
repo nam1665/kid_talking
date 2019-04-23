@@ -1,0 +1,420 @@
+.cpointer {
+    cursor: pointer;
+}
+
+.cgrab {
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+// btn 3d
+// ====================
+
+.btn-3d {
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    cursor: pointer;
+    padding: 25px 80px;
+    display: inline-block;
+    text-transform: capitalize;
+    letter-spacing: 1px;
+    font-weight: 700;
+    outline: none;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    outline: none !important;
+
+    &.btn-rounded-circle {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        padding: 0;
+    }
+
+    &.btn-rounded {
+        border-radius: 60px;
+        padding: 20px 50px;
+    }
+
+    &.btn-rounded-20 {
+        border-radius: 20px;
+        padding: 18px 50px;
+    }
+
+    &.btn-violet {
+        background: #b64aff;
+        color: #fff;
+        background-image: repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 20px,
+            transparent 20px,
+            transparent 40px
+        );
+        box-shadow: 0 6px #8436c8, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 4px #8436c8, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #8436c8, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-pink {
+        background: #fe84cf;
+        color: #fff;
+        box-shadow: 0 6px #f855b2, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 4px #f855b2, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #f855b2, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-blue {
+        background: #69adf6;
+        color: #fff;
+        box-shadow: 0 6px #3589ec, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 4px #3589ec, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #3589ec, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-green {
+        background: #00d53c;
+        color: #fff;
+        box-shadow: 0 6px #00bb00, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 4px #00bb00, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #00bb00, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-red {
+        background: #fa5340;
+        color: #fff;
+        box-shadow: 0 12px #a13529, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 6px #a13529, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #a13529, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-white {
+        background: #fff;
+        color: #ff6801;
+        box-shadow: 0 6px #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 4px #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-orange {
+        background: #fc7d0c;
+        color: #fff;
+        box-shadow: 0 12px #c56109, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+        border: 5px solid #feff99;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 6px #c56109, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #c56109, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    &.btn-grey {
+        background: #777;
+        color: #fff;
+        box-shadow: 0 12px #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+        background-image: repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.1) 0px,
+            rgba(255, 255, 255, 0.1) 20px,
+            transparent 20px,
+            transparent 40px
+        );
+        -webkit-transition: none;
+        -moz-transition: none;
+        transition: none;
+        border: 5px solid #777;
+
+        &:hover,
+        &.active {
+            box-shadow: 0 6px #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 2px;
+        }
+
+        &:active {
+            box-shadow: 0 0 #999, 0px 6px 25px 0px rgba(0, 0, 0, 0.3);
+            top: 6px;
+        }
+    }
+
+    .active-wrap {
+        width: 60px;
+        height: 60px;
+        box-shadow: inset 0px 0px 30px 0px rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 50%;
+        position: absolute;
+        right: 20px;
+        top: 8px;
+    }
+
+    .active-checked {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin-top: 6px;
+
+        img {
+            width: 80px;
+            height: auto;
+        }
+    }
+}
+
+// Button
+// ====================
+
+.btn {
+    &:focus {
+        box-shadow: none !important;
+    }
+}
+
+.btn-s1 {
+    background: #999;
+    color: #fff;
+    padding: 20px 25px;
+    border-radius: 45px;
+    font-size: 22px;
+
+    -webkit-box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    -moz-box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+
+    &.active,
+    &:hover {
+        background: #ffcc00;
+        color: #000;
+        -webkit-box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        -moz-box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        box-shadow: inset 0px 0px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    }
+}
+
+.footer {
+    padding: 1rem;
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+
+    img {
+        margin-right: 0.5rem;
+    }
+}
+
+// Font size
+// ====================
+
+.fz-18 {
+    font-size: 18px;
+}
+
+.fz-24 {
+    font-size: 24px;
+}
+
+.fz-26 {
+    font-size: 26px;
+}
+
+.fz-30 {
+    font-size: 30px;
+}
+
+.fz-40 {
+    font-size: 40px;
+}
+
+.fz-50 {
+    font-size: 50px;
+}
+
+// Text color
+// ====================
+
+.text-dark {
+    color: #271620;
+}
+
+// Link
+// ====================
+
+a {
+    text-decoration: none !important;
+}
+
+.linklink-blue {
+    color: #0068cb;
+
+    &:hover {
+        color: #0068cb;
+    }
+}
+
+// Form
+// ====================
+
+.checkbox-label {
+    display: block;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.checkbox-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 30px;
+    background-color: #fff;
+    border-radius: 5px;
+
+    -webkit-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+}
+.checkmark:after {
+    content: '';
+    position: absolute;
+    display: none;
+}
+
+.checkbox-label input:checked ~ .checkmark:after {
+    display: block;
+    background-image: url(https://i.imgur.com/wNEAfYa.png);
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 35px;
+    z-index: 9999;
+    position: absolute;
+    left: -3px;
+    top: -1px;
+    background-size: contain;
+}
+
+.btn-back {
+    background: transparent url(/images/back.png);
+    text-indent: -9999px;
+    width: 60px;
+    height: 60px;
+    background-size: 100% auto;
+    border: none;
+    position: fixed;
+    top: 30px;
+    left: 30px;
+}

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "checkJs": false,
+        "target": "es6",
+        "baseUrl": ".",
+        "paths": {
+            "src/*": ["./src/*"]
+        }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["build", "node_modules"]
+}

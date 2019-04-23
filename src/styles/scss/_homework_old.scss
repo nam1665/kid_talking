@@ -1,0 +1,273 @@
+.homework-wrap {
+    background-image: url('/images/homework_bg_1.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+
+    .header {
+        background: #ffd800;
+        border-bottom: 4px solid #f7c30d;
+
+        -webkit-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+        box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+            color: #453b00;
+            margin-bottom: 1rem;
+        }
+
+        .progress-wrap {
+            width: 100%;
+            padding: 0 3rem;
+        }
+
+        .progress {
+            background: #333365;
+            height: 2rem;
+            border-radius: 1rem;
+
+            -webkit-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+            -moz-box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0px 0px 25px -5px rgba(0, 0, 0, 0.5);
+
+            .progress-bar {
+                background-color: #ff6600 !important;
+            }
+        }
+
+        .progress-inner {
+            position: relative;
+
+            .number {
+                position: absolute;
+                text-align: center;
+                width: 100%;
+                top: 0;
+                height: 2rem;
+                line-height: 2rem;
+                color: #fff;
+                font-weight: bold;
+                font-size: 18px;
+            }
+        }
+    }
+
+    .content {
+        .imgWrap {
+            display: inline-block;
+            margin: 35px auto 0;
+            padding: 30px 20px 40px;
+            background: #fff;
+            border-radius: 5px;
+            position: relative;
+
+            -webkit-box-shadow: 10px 10px 50px 0px rgba(0, 0, 0, 0.1);
+            -moz-box-shadow: 10px 10px 50px 0px rgba(0, 0, 0, 0.1);
+            box-shadow: 10px 10px 50px 0px rgba(0, 0, 0, 0.1);
+
+            &:after,
+            &:before {
+                content: '';
+                position: absolute;
+                width: 59px;
+                height: 80px;
+                background-size: contain;
+                background-repeat: no-repeat;
+                top: -25px;
+            }
+
+            &:after {
+                background-image: url(/images/tape-2.png);
+                left: 20px;
+            }
+
+            &:before {
+                background-image: url(/images/tape-1.png);
+                right: 20px;
+            }
+        }
+
+        .active-checked {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .footer {
+        background-image: url(/images/homework_1_footer.png);
+        background-position: center bottom;
+        height: 260px;
+        width: 60%;
+        margin: 0 auto;
+        padding: 50px 120px 0;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        position: relative;
+
+        .btn-wrap {
+            width: 50%;
+            margin: 0 auto;
+            top: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: -15px;
+        }
+
+        .text-s1 {
+            font-size: 50px;
+            font-weight: bold;
+            color: #ff3400;
+            line-height: 1.2;
+        }
+
+        button {
+            width: 250px;
+        }
+    }
+
+    @media (max-width: 1440px) {
+        .container {
+            max-width: 1000px;
+        }
+
+        .footer {
+            height: 200px;
+
+            .text-s1 {
+                font-size: 30px;
+            }
+        }
+
+        .pickAudio {
+            .imgWrap {
+                img {
+                    width: 300px;
+                    height: 300px;
+                }
+            }
+
+            .btn-3d {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+        }
+
+        .TrueFalse.footer {
+            .btn-wrap {
+                margin-top: -20px;
+
+                button {
+                    width: 200px;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 1280px) {
+        .btn-next {
+            width: 80px;
+            height: 80px;
+
+            svg {
+                height: 50px;
+            }
+        }
+
+        .footer {
+            height: 180px;
+        }
+
+        .content {
+            .imgWrap {
+                img {
+                    height: 280px;
+                    width: 280px;
+                }
+            }
+        }
+
+        .pickAudio {
+            .btn-3d {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+        }
+
+        .footer.TrueFalse {
+            .btn-wrap {
+                width: 56%;
+
+                button {
+                    width: 175px;
+                    padding-top: 1rem;
+                    padding-bottom: 1rem;
+                }
+            }
+        }
+    }
+}
+
+.textAnswer {
+    border: 2px solid #fff;
+    background: #7dbe00;
+    border-radius: 10px;
+    color: #fff;
+    height: 50px;
+    width: 100px;
+    font-weight: bold;
+    font-size: 36px;
+    line-height: 46px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.textWrap {
+    display: inline-block;
+    width: 100px;
+    background: rgba(0, 0, 0, 0.5);
+    height: 50px;
+    border-radius: 10px;
+    vertical-align: middle;
+    line-height: 0.4;
+}
+
+.contentType5 {
+    border: 2px solid #fff;
+    background: #f9595b;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 50px;
+    padding: 3rem;
+    font-weight: 600;
+
+    -webkit-box-shadow: inset 0px 0px 30px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0px 0px 30px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0px 0px 30px 0px rgba(0, 0, 0, 0.2);
+
+    @media (max-width: 1280px) {
+        font-size: 40px;
+    }
+
+    ::-moz-selection {
+        /* Code for Firefox */
+        background: transparent;
+    }
+
+    ::selection {
+        background: transparent;
+    }
+}
+
+.finishHomeWorkWrap {
+    min-height: 100vh;
+    width: 100%;
+    background-image: url('/images/survey_bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}

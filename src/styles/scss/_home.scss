@@ -1,0 +1,468 @@
+@keyframes cardUp {
+    0% {
+        transform: translateZ(0);
+    }
+
+    25% {
+        transform: translate3d(0, 2%, 0);
+    }
+
+    50% {
+        transform: translateZ(0);
+    }
+
+    75% {
+        transform: translate3d(0, -2%, 0);
+    }
+
+    to {
+        transform: translateZ(0);
+    }
+}
+
+@keyframes cardDown {
+    0% {
+        transform: translateZ(0);
+    }
+
+    25% {
+        transform: translate3d(0, -2%, 0);
+    }
+
+    50% {
+        transform: translateZ(0);
+    }
+
+    75% {
+        transform: translate3d(0, 2%, 0);
+    }
+
+    to {
+        transform: translateZ(0);
+    }
+}
+
+@keyframes cloudMoveLeftRight {
+    from {
+        left: -200px;
+    }
+    to {
+        left: 110%;
+    }
+}
+
+@keyframes cloudMoveRightLeft {
+    from {
+        left: 110%;
+    }
+    to {
+        left: -400px;
+    }
+}
+
+.homepage-wrap {
+    min-height: 100vh;
+    background-image: url('/images/home_background.jpg');
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+
+    &:before,
+    &:after {
+        content: '';
+        position: absolute;
+        background-repeat: no-repeat;
+        background-size: 150%;
+        background-position: bottom center;
+        height: 100%;
+        width: 100%;
+        bottom: -50px;
+    }
+
+    &:before {
+        background-image: url('/images/big_cloud_back.png');
+        animation: cardUp 30s linear 3s infinite alternate;
+    }
+
+    &:after {
+        background-image: url('/images/big_cloud_front.png');
+        animation: cardDown 30s linear 3s infinite alternate;
+    }
+
+    .island {
+        background-image: url(/images/island.png);
+        background-repeat: no-repeat;
+        background-position: bottom right;
+        position: absolute;
+        width: 100%;
+        min-height: 100vh;
+        bottom: -2px;
+        z-index: 1;
+        background-size: 500px;
+
+        &:before {
+            content: '';
+            background-image: url(/images/bobi.gif);
+            background-repeat: no-repeat;
+            width: 490px;
+            height: 400px;
+            background-size: 100%;
+            position: absolute;
+            right: 20px;
+            bottom: 15px;
+        }
+    }
+
+    .balloom {
+        background-image: url('/images/login_bg_1.png');
+        background-repeat: no-repeat;
+        background-position: center top;
+        position: absolute;
+        width: 100%;
+        min-height: 100vh;
+        animation: cardUp 30s linear 3s infinite alternate;
+        z-index: 1;
+    }
+
+    .smallCloud {
+        &:before,
+        &:after {
+            content: '';
+            position: absolute;
+        }
+
+        &:before {
+            background-image: url(/images/small_cloud_back.png);
+            width: 150px;
+            height: 130px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            top: 15%;
+            animation: cloudMoveLeftRight 80s linear infinite;
+        }
+
+        &:after {
+            background-image: url(/images/small_cloud_front.png);
+            width: 350px;
+            height: 250px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            bottom: -50px;
+            animation: cloudMoveRightLeft 100s ease-in-out infinite;
+        }
+    }
+
+    .header {
+        position: relative;
+        z-index: 2;
+
+        .media {
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 10px 30px 10px 20px;
+            border-radius: 30px;
+
+            img {
+                border-radius: 20px;
+            }
+
+            .title {
+                font-size: 20px;
+                font-weight: bold;
+                color: #0c4654;
+            }
+
+            .level {
+                color: #0c4654;
+            }
+        }
+
+        .setting {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+
+            img {
+                height: 84px;
+            }
+        }
+    }
+
+    .main-wrap {
+        position: absolute;
+        top: 59%;
+        transform: translateY(-50%);
+        height: 500px;
+        z-index: 3;
+
+        .lesson {
+            position: absolute;
+            z-index: 3;
+            // top: 45%;
+            // transform: translateY(-50%);
+
+            &:after {
+                content: '';
+                position: absolute;
+                width: 160px;
+                height: 88px;
+                background: url('/images/chong_chong.gif') no-repeat top center;
+                background-size: 100% auto;
+                left: 50%;
+                margin-left: -85px;
+                top: -54px;
+                z-index: -1;
+            }
+
+            .lesson-inner {
+                background-image: url('/images/6.png');
+                background-repeat: no-repeat;
+                background-size: 100%;
+                height: 454px;
+                width: 328px;
+            }
+
+            .content {
+                width: 294px;
+                height: 365px;
+                background-color: #fff;
+                position: absolute;
+                border-radius: 28px;
+                bottom: 16px;
+                left: 50%;
+                transform: translatex(-50%);
+                margin-left: -1px;
+            }
+
+            &.exam {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 25px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+
+            &.unit {
+                animation: cardDown 10s linear 1s infinite alternate;
+                text-align: center;
+                text-align: center;
+                left: 400px;
+
+                .content {
+                    padding: 0 35px;
+                }
+
+                .title {
+                    font-size: 26px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                .time {
+                    color: #772500;
+                }
+
+                .star {
+                    img {
+                        width: 30px;
+                    }
+                }
+
+                .thumbnail {
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: 30px;
+
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+
+                        -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                        -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                        box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                    }
+
+                    img {
+                        width: 100%;
+                    }
+                }
+
+                .teacher-name {
+                    font-size: 24px;
+                    font-weight: bold;
+                    line-height: 1;
+                    color: #772500;
+                }
+
+                // .button-wrap {
+                //     position: absolute;
+                //     bottom: 40px;
+                //     width: 100%;
+                //     padding: 0 30px;
+                // }
+            }
+        }
+
+        .lesson_copy {
+            position: absolute;
+            z-index: 3;
+            // top: 45%;
+            // transform: translateY(-50%);
+
+            &:after {
+                content: '';
+                position: absolute;
+                width: 160px;
+                height: 88px;
+                background: url('/images/chong_chong.gif') no-repeat top center;
+                background-size: 100% auto;
+                left: 50%;
+                margin-left: -85px;
+                top: -54px;
+                z-index: -1;
+            }
+
+            .lesson-inner {
+                background-image: url('/images/6.png');
+                background-repeat: no-repeat;
+                background-size: 100%;
+                height: 454px;
+                width: 328px;
+            }
+
+            .content {
+                width: 294px;
+                height: 365px;
+                background-color: #fff;
+                position: absolute;
+                border-radius: 28px;
+                bottom: 16px;
+                left: 50%;
+                transform: translatex(-50%);
+                margin-left: -1px;
+            }
+
+            &.exam {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 25px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+
+            &.unit {
+                animation: cardDown 10s linear 1s infinite alternate;
+                text-align: center;
+                text-align: center;
+                left: 400px;
+
+                .content {
+                    padding: 0 35px;
+                }
+
+                .title {
+                    font-size: 26px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                .time {
+                    color: #772500;
+                }
+
+                .star {
+                    img {
+                        width: 30px;
+                    }
+                }
+
+                .thumbnail {
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: 30px;
+
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+
+                        -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                        -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                        box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+                    }
+
+                    img {
+                        width: 100%;
+                    }
+                }
+
+                .teacher-name {
+                    font-size: 24px;
+                    font-weight: bold;
+                    line-height: 1;
+                    color: #772500;
+                }
+
+                // .button-wrap {
+                //     position: absolute;
+                //     bottom: 40px;
+                //     width: 100%;
+                //     padding: 0 30px;
+                // }
+            }
+        }
+    }
+}
