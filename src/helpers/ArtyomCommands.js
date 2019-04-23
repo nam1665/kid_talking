@@ -19,18 +19,6 @@ export default class ArtyomCommandsManager {
                     Artyom.say("Bye bye");
                 }
             },
-            {
-                indexes: ["What's the weather today"],
-                action: () => {
-                    Artyom.say("It's a sunny day, but it's irrelevant to our lesson. Please ask something about Domestic Object");
-                }
-            },
-            {
-                indexes: ["What is your name"],
-                action: () => {
-                    Artyom.say("My name is Topi, I will guide you today");
-                }
-            },
         ]);
     }
 }

@@ -30,6 +30,11 @@ var question_5_trigger = "question_5_trigger";
 var question_6_trigger = "question_6_trigger";
 
 
+var question_7_trigger = "question_7_trigger";
+
+var question_8_trigger = "question_8_trigger";
+
+
 var pronun_start = "pronun_trigger_1"
 
 class Layout extends React.PureComponent {
@@ -201,6 +206,21 @@ class Layout extends React.PureComponent {
       }
 
       if(this.state.text.includes("question 6")) {
+        this.send(question_6_trigger);
+
+      }
+
+      if(this.state.text.includes("question 7")) {
+        this.send(question_7_trigger);
+
+      }
+
+      if(this.state.text.includes("question 8")) {
+        this.send(question_8_trigger);
+
+      }
+
+      if(this.state.text.includes("is a watermelon")) {
         this.send(question_6_trigger);
 
       }
