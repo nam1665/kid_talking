@@ -416,12 +416,15 @@ class Results extends React.PureComponent {
 
         <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
         <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
-        <ReactMic
-          record={this.state.record}
-          onStop={this.onStop}
-          hidden='hidden'/>
-        <button onTouchTap={this.startRecording} type="button">Start</button>
-        <button onTouchTap={this.stopRecording} type="button">Stop</button>
+        <div className="hidden" style={divStyle} hidden>
+          <ReactMic
+            record={this.state.record}
+            onStop={this.onStop}
+            hidden='hidden'/>
+          <button onTouchTap={this.startRecording} type="button">Start</button>
+          <button onTouchTap={this.stopRecording} type="button">Stop</button>
+
+        </div>
 
       </div>
     )
