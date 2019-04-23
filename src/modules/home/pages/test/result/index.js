@@ -15,8 +15,6 @@ var starter_triger = 'this_is_the_trigger_for_starter_test';
 
 var question_1_trigger = 'question_1_trigger';
 
-var trigger_intent = '';
-
 var question_2_trigger = "question_2_trigger";
 
 var question_3_trigger = "question_3_trigger";
@@ -27,11 +25,9 @@ var question_5_trigger = "question_5_trigger";
 
 var question_6_trigger = "question_6_trigger";
 
-
 var question_7_trigger = "question_7_trigger";
 
 var question_8_trigger = "question_8_trigger";
-
 
 var pronun_start = "pronun_trigger_1"
 
@@ -218,12 +214,6 @@ class Results extends React.PureComponent {
         this.send(question_8_trigger);
 
       }
-
-      if(this.state.text.includes("is a watermelon")) {
-        this.send(question_6_trigger);
-
-      }
-
 
       if(this.state.text.includes("let's practice some new words")) {
         this.send(pronun_start);
