@@ -14,7 +14,10 @@ export default class ArtyomCommandsManager {
         // Here you can load all the commands that you want to Artyom
         return Artyom.addCommands([
             {
-
+                indexes: [""],
+                action: () => {
+                    Artyom.say("");
+                }
             },
         ]);
     }
