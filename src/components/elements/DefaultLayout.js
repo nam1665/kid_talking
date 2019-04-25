@@ -153,6 +153,9 @@ class Layout extends React.PureComponent {
             current_question: this.current_question
           })
         }
+        console.log("next question is " + this.state.next_test_quesion);
+        console.log("status question is " + this.state.status_change_question);
+
 
         if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
           this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
@@ -194,7 +197,6 @@ class Layout extends React.PureComponent {
       }
 
       if (this.state.status_change_question){
-        console.log("change question = trueeee")
         this.send(this.state.next_test_quesion);
       }
       this.setState({
