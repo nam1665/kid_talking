@@ -254,9 +254,9 @@ class Layout extends React.PureComponent {
       //   this.send(pronun_start);
       // }
       //
-      // if(this.state.text.includes("Native Speaker")) {
-      //   this.send(this.state.next_pronun_question);
-      // }
+      if(this.state.text.includes("Native Speaker")) {
+        this.send(this.state.next_pronun_question);
+      }
 
       this.startAssistant();
 
