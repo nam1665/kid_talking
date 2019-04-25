@@ -201,7 +201,6 @@ class Layout extends React.PureComponent {
       }
 
       if (this.state.status_change_question){
-        this.startAssistant();
         this.send(this.state.next_test_quesion);
       }
       this.setState({
@@ -259,6 +258,7 @@ class Layout extends React.PureComponent {
       //   this.send(this.state.next_pronun_question);
       // }
 
+      this.startAssistant();
 
 
     };
