@@ -4,511 +4,259 @@ import { withRouter } from 'react-router-dom';
 import Route from 'src/helpers/Route';
 import { Progress } from 'reactstrap';
 import Alert from '../Alert';
-import uuid from "uuid";
-import { ReactMic } from 'react-mic';
-
-
-import Artyom from 'artyom.js';
-import ArtyomCommandsManager from 'src/helpers/ArtyomCommands';
-
-const Jarvis = new Artyom();
-
-var starter_triger = 'start_trigger';
-
-var question_1_trigger = 'question_1_trigger';
-
-var question_2_trigger = "question_2_trigger";
-
-var question_3_trigger = "question_3_trigger";
-
-var question_4_trigger = "question_4_trigger";
-
-var question_5_trigger = "question_5_trigger";
-
-var question_6_trigger = "question_6_trigger";
-
-
-var question_7_trigger = "question_7_trigger";
-
-var question_8_trigger = "question_8_trigger";
-
-
-var pronun_start = "pronun_trigger_1";
 
 class Layout extends React.PureComponent {
+  constructor(props) {
+    super(props);
 
-  constructor (props, context){
-    super(props, context);
-
-    // Add `this` context to the handler functions
-    this.startAssistant = this.startAssistant.bind(this);
-    this.stopAssistant = this.stopAssistant.bind(this);
-
-    // Prepare simple state
-    this.state = {
-      artyomActive: false,
-      artyomIsReading: false
-    };
-
+    this.startTime = Date.now();
+    this.time = 0;
   }
-  state = {
-    image: '',
-    text: '',
-    serverHistory: [],
-    checked: null,
-    showTest: false,
-    jarvis_say: '',
-    record: false,
-    status_pronunciation: false,
-    status_change_question: false
-
-  };
-  show = false;
-  session_id = uuid.v4();
-  score = "";
-  pronunciation_text = "";
-  next_test_quesion = "";
-  next_pronun_question = "";
-  student_point = 0;
-  current_question = "";
 
   componentDidMount() {
-    // this.startAssistant();
-    this.startAssistant();
+    if (this.props.q_audio) {
+      this.playAudio(this.props.q_audio);
+    }
 
-    //trigger dialogflow for starter test
-    this.send(starter_triger);
-
+    this.interval = setInterval(() => {
+      this.time = Date.now() - this.startTime;
+    }, 1000);
   }
 
-  postData(url = '', data, type='json') {
-    if (type == 'json'){
-      return fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-          'Content-Type': 'application/json'
-          // "Content-Type": "application/x-www-form-urlencoded",
-        },
-        redirect: 'follow', // manual, *follow, error
-        referrer: 'no-referrer', // no-referrer, *client
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
-      }).then(response => response.json()); // parses JSON response into native Javascript objects
-    }
-    else {
-      return fetch(url, {
-        method: 'POST',
-        body: data
-      }).then(response => response.json());
+  UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+    // if (nextProps.q_audio !== )
+    const { q_audio: oldAudio } = this.props;
+    const { q_audio: newAudio } = nextProps;
+
+    console.log('oldAudio', oldAudio);
+    console.log('newAudio', newAudio);
+
+    if (oldAudio !== newAudio) {
+      this.playAudio(newAudio);
     }
   }
 
-
-  send(q) {
-
-    this.setState({
-      status_pronunciation: false
-    })
-    this.postData('https://ai.kidtopi.com/gateway/?format=true', {
-      q: q,
-      session_id: this.session_id,
-      lang: 'en'
-    })
-      .then(data => {
-        this.handle(data)
-      }) // JSON-string from `response.json()` call
-      .catch(error => console.error(error));
-  }
-
-  handle(data){
-    this.show = true;
-    // hiển thị duy nhất 1 ảnh và respon ở 1 dòng
-    let img = '';
-    let text_new = '';
-    for (let component in data.components){
-      if (data.components[component].name == 'IMAGE') {
-        if (this.state.image != data.components[component].content.imageUri){
-          img =  data.components[component].content.imageUri
-        }
-      }
-      if (data.components[component].name == 'DEFAULT') {
-        if (text_new.length == 0){
-          text_new = data.components[component].content
-        }
-        else {
-          text_new += " " + data.components[component].content
-        }
-      }
-      if (data.components[component].name == 'PAYLOAD') {
-
-        if (data.components[component].content.fields.hasOwnProperty('current_question')){
-          this.current_question = data.components[component].content.fields.current_question.stringValue;
-          this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
-          this.student_point = data.components[component].content.fields.student_point.stringValue;
-          this.setState({
-            status_change_question: true,
-            next_test_quesion: this.next_test_quesion,
-            current_question: this.current_question
-          })
-        }
-        console.log("next question is " + this.state.next_test_quesion);
-        console.log("status question is " + this.state.status_change_question);
-
-
-        if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
-          this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
-          this.next_pronun_question = data.components[component].content.fields.next_pronun_question.stringValue;
-          this.setState({
-            status_pronunciation: true,
-            next_pronun_question: this.next_pronun_question
-          })
-        }
-
-        console.log("next pronun question is " + this.state.next_pronun_question);
-        console.log("status question is " + this.state.status_pronunciation);
-
-      }
-
+  componentWillUnmount() {
+    if (this.audio) {
+      this.audio.pause();
     }
-    if (img.length > 0){
-      this.setState({
-        image: img,
-        text: text_new
-      })
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
-    else {
-      this.setState({
-        text: text_new
-      })
+
+    if (this.timeout2) {
+      clearTimeout(this.timeout2);
     }
-    this.stopAssistant();
 
-    this.textToSpeech(this.state.text);
-
-  }
-
-
-  textToSpeech(text) {
-    let speech = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(speech);
-    speech.onend = () => {
-
-      if (this.state.status_pronunciation){
-        this.stopAssistant();
-        this.startRecording();
-      }
-
-      if (this.state.status_change_question){
-        this.send(this.state.next_test_quesion);
-      }
-      this.setState({
-        status_change_question: false
-      });
-
-
-      // if(this.state.text.includes("start our test")) {
-      //   this.send(question_1_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 2")) {
-      //   this.send(question_2_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 3")) {
-      //   this.send(question_3_trigger);
-      //
-      // }
-      //
-      //
-      // if(this.state.text.includes("question 4")) {
-      //   this.send(question_4_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 5")) {
-      //   this.send(question_5_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 6")) {
-      //   this.send(question_6_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 7")) {
-      //   this.send(question_7_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 8")) {
-      //   this.send(question_8_trigger);
-      //
-      // }
-
-
-      // if(this.state.text.includes("let's practice some new words")) {
-      //   this.send(pronun_start);
-      // }
-      //
-      if(this.state.text.includes("Native Speaker")) {
-        this.send(this.state.next_pronun_question);
-      }
-
-      this.startAssistant();
-
-
-    };
-  }
-
-  startAssistant() {
-
-    let _this = this;
-
-    console.log("Artyom succesfully started !");
-
-    Jarvis.initialize({
-      lang: "en-US",
-      debug: true,
-      continuous: true,
-      soundex: true,
-      listen: true
-    }).then(() => {
-      // Display loaded commands in the console
-      console.log(Jarvis.getAvailableCommands());
-
-      _this.setState({
-        artyomActive: true
-      });
-    }).catch((err) => {
-      console.error("Oopsy daisy, this shouldn't happen !", err);
-    });
-
-    Jarvis.redirectRecognizedTextOutput((recognized,isFinal) => {
-      if(isFinal){
-        if (this.state.status_pronunciation){
-          this.setState({
-            speech_result_final: recognized
-          })
-          this.stopRecording();
-        }
-        else {
-          this.setState({
-            speech_result_final: recognized,
-            speech_status: 'speech sent'
-          })
-          this.send(recognized);
-        }
-      }else{
-        this.setState({
-          speech_result: recognized,
-          speech_status: 'not stopped yet'
-        })
-        console.log(recognized)
-
-      }
-    });
-
-    let CommandsManager = new ArtyomCommandsManager(Jarvis);
-    CommandsManager.loadCommands();
-
-
-  }
-
-  stopAssistant() {
-    let _this = this;
-
-    Jarvis.fatality().then(() => {
-      console.log("Jarvis has been succesfully stopped");
-
-      _this.setState({
-        artyomActive: false
-      });
-
-    }).catch((err) => {
-      console.error("Oopsy daisy, this shouldn't happen neither!", err);
-
-      _this.setState({
-        artyomActive: false
-      });
-    });
-  }
-
-  startRecording = () => {
-    this.setState({
-      record: true
-    });
-  }
-
-  stopRecording = () => {
-    this.setState({
-      record: false
-    });
-  }
-
-  setText(){
-    this.setState({
-      text: this.score,
-      status_pronunciation: false
-    })
-  }
-
-  checkPronunciation(blob, input_text) {
-    var filename = new Date().toISOString();
-    var fd=new FormData();
-    fd.append("text", input_text );
-    fd.append("file",blob, filename);
-
-    var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
-    this.postData(url_api, fd, 'FormData')
-      .then(data => {
-
-        let score = data.text_score.quality_score;
-
-
-        let text_new = "";
-        if (score >= 80){
-          text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
-          this.setState({
-            image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
-          });
-        }
-        else if(score < 80 && score > 60 ) {
-          this.setState({
-            image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
-          });
-          text_new = 'So close, you got ' + score + '% like Native Speaker.';
-        }
-        else  {
-          text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
-          this.setState({
-            image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
-          });
-        }
-
-        this.textToSpeech(text_new);
-        this.setState({
-          text: text_new,
-          status_pronunciation: false
-        })
-      })
-      .catch(error => console.error(error));
-  }
-
-
-  onStop= (blobObject) => {
-    console.log('recordedBlob is: ', blobObject);
-    this.checkPronunciation(blobObject.blob, this.pronunciation_text);
-  }
-
-
-
-
-  renderQuestion() {
-    if (this.show) {
-      return (
-        <div className="col-md-7 text-center">
-          <h2 className="text-white">{this.state.text}</h2>
-          <p className="mb-2">
-            <img src={this.state.image} alt="" style={{ width: 350 }} />
-          </p>
-        </div>
-      );
+    if (this.interval) {
+      clearInterval(this.time);
     }
+
+    if (this.soundBtn) this.soundBtn.classList.remove('d-none');
+
+    this.removeEvent();
   }
 
-  _renderSpeechtoText() {
+  playAudio = url => {
+    if (!url) return;
 
+    if (this.audio && this.audio.isPlaying) return;
 
-    const divStyle = {
-      zIndex: 999999
-    };
+    this.removeEvent();
 
+    this.audio = new Audio(url);
 
-    return (
+    this.addEvent();
 
+    if (typeof this.audio.play == 'function') this.audio.play();
 
+    this.audio.isPlaying = true;
+  };
 
-      <div className="lesson_copy" style={divStyle}>
-        <div className="">
-          <div className="title">Speak Status: {this.state.speech_status}</div>
-        </div>
-      </div>
+  addEvent = () => {
+    if (!this.audio) return;
 
-    );
+    this.audio.addEventListener('ended', this.handleAudioEnd.bind(this));
+  };
+
+  removeEvent = () => {
+    if (!this.audio) return;
+
+    this.audio.removeEventListener('ended', this.handleAudioEnd.bind(this));
+  };
+
+  handleAudioEnd() {
+    // this.instruction.classList.add('hidden');
+    const { onSoundEnded } = this.props;
+
+    this.audio.isPlaying = false;
+
+    if (onSoundEnded) onSoundEnded();
   }
 
-  _javisrender() {
+  handleAudioButton(e) {
+    e.preventDefault();
 
-    const divStyle = {
-      zIndex: 999999
-    };
+    // this.instruction.classList.remove('hidden');
 
-    return (
-      <div className="javis" style={divStyle}>
+    const { handleAudioButton } = this.props;
 
-        <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
-        <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
+    if (handleAudioButton && typeof handleAudioButton == 'function') {
+      return handleAudioButton();
+    }
 
-        <div className="hidden" style={divStyle} hidden>
-          <ReactMic
-            record={this.state.record}
-            onStop={this.onStop}
-            hidden='hidden'/>
-          <button onTouchTap={this.startRecording} type="button">Start</button>
-          <button onTouchTap={this.stopRecording} type="button">Stop</button>
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.audio.play();
+    }
 
-        </div>
-
-      </div>
-    )
+    this.timeout2 = setTimeout(() => {
+      this.soundBtn.classList.add('d-none');
+    }, 2000);
   }
 
+  handleBackButton(e) {
+    e.preventDefault();
+
+    const confirm = window.confirm('Bạn có muốn thoát khỏi bài kiểm tra?');
+
+    if (confirm) this.props.history.push(Route.home);
+  }
 
   render() {
+    const {
+      current,
+      totalQuestions,
+      onNext,
+      children,
+      title,
+      instructorClass,
+      progressClass,
+      extendCom: Component,
+      background,
+      wrapperClasses,
+      alertMessage,
+      showModel
+    } = this.props;
+    const progress = (current / totalQuestions) * 100;
+
+    let style = {};
+
+    if (background) {
+      style = {
+        backgroundImage: `url(${background})`
+      };
+    }
 
     return (
-      <div className="finishHomeWorkWrap py-5 d-flex justify-content-center align-items-center flex-column">
-        <div className="fz-50 text-white font-weight-bold mb-4">Kidtopi Speaking Test</div>
+      <div className={`homework-wrap justify-content-between flex-column ${wrapperClasses}`}>
+        {Component ? <Component /> : null}
+        {/* Start Header */}
+        <div className="siteHeader d-flex justify-content-end">
+          {/* Tạm thời sẽ ẩn nút back */}
+          {/* <a className="btnBack" href="#" onClick={this.handleBackButton.bind(this)}>
+                        <img src="/images/homework/back.png" alt="" />
+                    </a> */}
 
-        <div className="typeTwentySeven w-100">
-          <div className="container">
-            <div className="row justify-content-center">{this.renderQuestion()}</div>
-            {this._renderSpeechtoText()}
-            {this._javisrender()}
+          <div className={`instruction ${instructorClass}`} ref={e => (this.instruction = e)}>
+            <div className="inner d-flex align-items-center">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: title
+                }}
+              />
+            </div>
+          </div>
+
+          {this.props.q_audio && (
+            <a
+              className="btnInstruction"
+              href="#"
+              onClick={this.handleAudioButton.bind(this)}
+              ref={e => (this.soundBtn = e)}
+            >
+              <img src="/images/homework/voiceBlue.png" alt="" />
+            </a>
+          )}
+        </div>
+        {/* End Header */}
+
+        {/* Start Content */}
+        <div className="d-flex w-100 h-100 justify-content-center align-items-center">{children}</div>
+        {/* Start Content */}
+
+        {/* Start Footer */}
+        <div className="siteFooter fixed-bottom">
+          <div className={`progressWrap ${progressClass}`}>
+            <div className="number">
+              {current}/{totalQuestions}
+            </div>
+            <Progress value={progress} />
+          </div>
+          <div className={`btnNextWrap pl-4 d-flex justify-content-center align-items-center`}>
+            <span className="text mr-3 mt-2">Next</span>
+            <button
+              className="btn-3d btn-rounded-circle btn-pink"
+              onClick={() => {
+                if (showModel) this.alertForm.toggle();
+                else if (onNext) onNext(this.time);
+              }}
+            >
+              <svg style={{ height: '45px' }} viewBox="0 0 256 512">
+                <path
+                  fill="currentColor"
+                  d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
+                />
+              </svg>
+            </button>
           </div>
         </div>
-
-        {/*<div className="text-center">*/}
-        {/*<img style={{ width: '80%' }} src="/images/goodjob.png" alt="" />*/}
-        {/*</div>*/}
-
-        {/*<div className="fz-40 text-white font-weight-bold mt-4 text-center px-5">*/}
-        {/*Cảm ơn bé đã hoàn thành bài kiểm tra,*/}
-        {/*<br /> chúng tôi sẽ liên hệ lại để thông báo kết quả trong thời gian sớm nhất*/}
-        {/*</div>*/}
-
-        {/* <div className="text-center mt-4">
-                    <button
-                        className="btn-3d btn-white btn-rounded fz-26"
-                        style={{ textTransform: 'inherit' }}
-                        onClick={() => {
-                            // this.setState({
-                            //     showTest: !this.state.showTest
-                            // });
-                            this.props.history.push(Route.home);
-                        }}
-                    >
-                        Báo cáo kiểm tra
-                    </button>
-                </div> */}
+        {/* End Footer */}
+        <Alert
+          ref={e => (this.alertForm = e)}
+          message={alertMessage ? alertMessage : 'Bạn chắc chắn muốn chuyển tới câu sau?'}
+          onOk={() => {
+            if (onNext) onNext(this.time);
+          }}
+        />
+        {background ? (
+          <img
+            src={background}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              height: '100vh'
+            }}
+          />
+        ) : null}
       </div>
     );
   }
 }
 
+Layout.propTypes = {
+  onNext: PropTypes.func,
+  data: PropTypes.array,
+  q_audio: PropTypes.any,
+  current: PropTypes.number,
+  totalQuestions: PropTypes.number,
+  history: PropTypes.any,
+  children: PropTypes.any,
+  showNextButton: PropTypes.bool,
+  title: PropTypes.string,
+  instructorClass: PropTypes.string,
+  progressClass: PropTypes.string,
+  extendCom: PropTypes.any,
+  background: PropTypes.string,
+  wrapperClasses: PropTypes.string,
+  alertMessage: PropTypes.string,
+  showModel: PropTypes.bool
+};
 
 export default withRouter(Layout);
