@@ -165,6 +165,10 @@ class Layout extends React.PureComponent {
             next_pronun_question: this.next_pronun_question
           })
         }
+
+        console.log("next pronun question is " + this.state.next_pronun_question);
+        console.log("status question is " + this.state.status_pronunciation);
+
       }
 
     }
