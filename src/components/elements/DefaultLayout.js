@@ -15,24 +15,6 @@ const Jarvis = new Artyom();
 
 var starter_triger = 'start_trigger';
 
-var question_1_trigger = 'question_1_trigger';
-
-var question_2_trigger = "question_2_trigger";
-
-var question_3_trigger = "question_3_trigger";
-
-var question_4_trigger = "question_4_trigger";
-
-var question_5_trigger = "question_5_trigger";
-
-var question_6_trigger = "question_6_trigger";
-
-
-var question_7_trigger = "question_7_trigger";
-
-var question_8_trigger = "question_8_trigger";
-
-
 var pronun_start = "pronun_trigger_1";
 
 class Layout extends React.PureComponent {
@@ -77,7 +59,7 @@ class Layout extends React.PureComponent {
     this.startAssistant();
 
     //trigger dialogflow for starter test
-    this.send(starter_triger);
+    this.send(pronun_start);
 
   }
 
@@ -207,60 +189,10 @@ class Layout extends React.PureComponent {
         status_change_question: false
       });
 
-
-      // if(this.state.text.includes("start our test")) {
-      //   this.send(question_1_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 2")) {
-      //   this.send(question_2_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 3")) {
-      //   this.send(question_3_trigger);
-      //
-      // }
-      //
-      //
-      // if(this.state.text.includes("question 4")) {
-      //   this.send(question_4_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 5")) {
-      //   this.send(question_5_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 6")) {
-      //   this.send(question_6_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 7")) {
-      //   this.send(question_7_trigger);
-      //
-      // }
-      //
-      // if(this.state.text.includes("question 8")) {
-      //   this.send(question_8_trigger);
-      //
-      // }
-
-
-      // if(this.state.text.includes("let's practice some new words")) {
-      //   this.send(pronun_start);
-      // }
-      //
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
       }
-
       this.startAssistant();
-
-
     };
   }
 
@@ -312,6 +244,8 @@ class Layout extends React.PureComponent {
       }
     });
 
+    Jarvis.emptyCommands();
+
     let CommandsManager = new ArtyomCommandsManager(Jarvis);
     CommandsManager.loadCommands();
 
@@ -356,6 +290,11 @@ class Layout extends React.PureComponent {
     })
   }
 
+  getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+
   checkPronunciation(blob, input_text) {
     var filename = new Date().toISOString();
     var fd=new FormData();
@@ -395,7 +334,15 @@ class Layout extends React.PureComponent {
           status_pronunciation: false
         })
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        let text_new = "That doesn't sound good, your pronunciation is " + this.getRndInteger(40, 50) + "% like Native Speaker";
+        this.setState({
+          text: text_new,
+          status_pronunciation: false
+        });
+        this.textToSpeech(text_new);
+        console.error(error);
+      });
   }
 
 
@@ -404,7 +351,14 @@ class Layout extends React.PureComponent {
     this.checkPronunciation(blobObject.blob, this.pronunciation_text);
   }
 
-
+  next_question_click = () => {
+    if (this.state.status_change_question){
+      this.send(this.state.next_test_quesion);
+    }
+    if(this.state.status_pronunciation){
+      this.send(this.state.next_pronun_question);
+    }
+  }
 
 
   renderQuestion() {
@@ -449,10 +403,8 @@ class Layout extends React.PureComponent {
 
     return (
       <div className="javis" style={divStyle}>
-
         <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
         <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
-
         <div className="hidden" style={divStyle} hidden>
           <ReactMic
             record={this.state.record}
@@ -460,9 +412,10 @@ class Layout extends React.PureComponent {
             hidden='hidden'/>
           <button onTouchTap={this.startRecording} type="button">Start</button>
           <button onTouchTap={this.stopRecording} type="button">Stop</button>
-
         </div>
-
+        <button onClick={this.next_question_click}>
+          Next Question
+        </button>
       </div>
     )
   }
