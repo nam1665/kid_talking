@@ -178,7 +178,6 @@ class Layout extends React.PureComponent {
     speech.onend = () => {
 
       if (this.state.status_pronunciation){
-        this.stopAssistant();
         this.startRecording();
       }
 
