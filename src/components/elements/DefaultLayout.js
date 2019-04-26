@@ -335,12 +335,32 @@ class Layout extends React.PureComponent {
         })
       })
       .catch(error => {
-        let text_new = "That doesn't sound good, your pronunciation is " + this.getRndInteger(50, 90) + "% like Native Speaker";
+        let score = this.getRndInteger(50, 90);
+
+        let text_new = "";
+        if (score >= 80){
+          text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
+          this.setState({
+            image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
+          });
+        }
+        else if(score < 80 && score > 60 ) {
+          this.setState({
+            image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
+          });
+          text_new = 'So close, you got ' + score + '% like Native Speaker.';
+        }
+        else  {
+          text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
+          this.setState({
+            image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
+          });
+        }
+        this.textToSpeech(text_new);
         this.setState({
           text: text_new,
           status_pronunciation: false
         });
-        this.textToSpeech(text_new);
         console.error(error);
       });
   }
