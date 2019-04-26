@@ -51,7 +51,7 @@ class Layout extends React.PureComponent {
   pronunciation_text = "";
   next_test_quesion = "";
   next_pronun_question = "";
-  student_point = 0;
+  student_total_point = 0;
   current_question = "";
 
   componentDidMount() {
@@ -129,10 +129,20 @@ class Layout extends React.PureComponent {
           this.current_question = data.components[component].content.fields.current_question.stringValue;
           this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
           this.student_point = data.components[component].content.fields.student_point.stringValue;
-          this.setState({
+          console.log(this.student_point + "   student point");
+          if(this.student_point == "1"){
+            console.log("trueeeee + 1");
+            this.state.student_total_point += 1;
+          }
+          if(this.student_point == "0.5") {
+            console.log("trueeeee + 0.5")
+            this.state.student_total_point += 0.5;
+
+          }
+            this.setState({
             status_change_question: true,
             next_test_quesion: this.next_test_quesion,
-            current_question: this.current_question
+            current_question: this.current_question,
           })
         }
         console.log("next question is " + this.state.next_test_quesion);
@@ -150,6 +160,7 @@ class Layout extends React.PureComponent {
 
         console.log("next pronun question is " + this.state.next_pronun_question);
         console.log("status question is " + this.state.status_pronunciation);
+        console.log("student total point is " + this.state.student_total_point);
 
       }
 
