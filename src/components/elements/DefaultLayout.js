@@ -335,12 +335,6 @@ class Layout extends React.PureComponent {
         })
       })
       .catch(error => {
-        let text_new = "That doesn't sound good, your pronunciation is " + this.getRndInteger(40, 50) + "% like Native Speaker";
-        this.setState({
-          text: text_new,
-          status_pronunciation: false
-        });
-        this.textToSpeech(text_new);
         console.error(error);
       });
   }
