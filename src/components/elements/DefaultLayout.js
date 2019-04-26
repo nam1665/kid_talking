@@ -59,7 +59,7 @@ class Layout extends React.PureComponent {
     this.startAssistant();
 
     //trigger dialogflow for starter test
-    this.send(pronun_start);
+    this.send(starter_triger);
 
   }
 
@@ -335,6 +335,12 @@ class Layout extends React.PureComponent {
         })
       })
       .catch(error => {
+        let text_new = "That doesn't sound good, your pronunciation is " + this.getRndInteger(50, 90) + "% like Native Speaker";
+        this.setState({
+          text: text_new,
+          status_pronunciation: false
+        });
+        this.textToSpeech(text_new);
         console.error(error);
       });
   }
