@@ -59,7 +59,7 @@ class Layout extends React.PureComponent {
     this.startAssistant();
 
     //trigger dialogflow for starter test
-    this.send(starter_triger);
+    this.send(pronun_start);
 
   }
 
