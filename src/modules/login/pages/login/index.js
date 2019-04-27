@@ -67,6 +67,7 @@ class LoginLayout extends PureComponent {
 
         //trigger dialogflow for starter test
         this.send(starter_triger);
+        this.textToSpeech(this.state.text);
 
     }
 
