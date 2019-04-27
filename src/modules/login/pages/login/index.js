@@ -119,7 +119,7 @@ class LoginLayout extends PureComponent {
 
     componentDidMount() {
         this.startAssistant();
-        this.send('text_similaty');
+        this.send(pronun_start);
     }
 
     postData(url = '', data, type='json') {
