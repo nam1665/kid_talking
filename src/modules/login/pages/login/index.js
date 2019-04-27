@@ -24,6 +24,20 @@ var starter_triger = 'start_trigger';
 
 var pronun_start = "pronun_trigger_1";
 
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth() + 1; //January is 0!
+
+var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+var yyyy = today.getFullYear();
+if (dd < 10) {
+    dd = '0' + dd;
+}
+if (mm < 10) {
+    mm = '0' + mm;
+}
+var today = dd + '/' + mm + '/' + yyyy;
+
 class LoginLayout extends PureComponent {
     constructor (props, context){
         super(props, context);
@@ -135,14 +149,51 @@ class LoginLayout extends PureComponent {
                     this.student_point = data.components[component].content.fields.student_point.stringValue;
                     console.log(this.student_point + "   student point");
                     if(this.student_point == "1"){
-                        console.log("trueeeee + 1");
-                        this.state.student_total_point += 1;
+                        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                            question_id: this.current_question,
+                            session_id: this.session_id,
+                            answer: 'right',
+                            point: 1,
+                            test_level: 'starter',
+                            date: today,
+                            time: time
+                        })
+                          .then(data => {
+                              console.log("post sucess")
+                          }) // JSON-string from `response.json()` call
+                          .catch(error => console.error(error));
                     }
                     if(this.student_point == "0.5") {
-                        console.log("trueeeee + 0.5")
-                        this.state.student_total_point += 0.5;
-
+                        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                            question_id: this.current_question,
+                            session_id: this.session_id,
+                            answer: 'right',
+                            point: 0.5,
+                            test_level: 'starter',
+                            date: today,
+                            time: time
+                        })
+                          .then(data => {
+                              console.log("post sucess")
+                          }) // JSON-string from `response.json()` call
+                          .catch(error => console.error(error));
                     }
+                    if(this.student_point == "0") {
+                        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                            question_id: this.current_question,
+                            session_id: this.session_id,
+                            answer: 'wrong',
+                            point: 0,
+                            test_level: 'starter',
+                            date: today,
+                            time: time
+                        })
+                          .then(data => {
+                              console.log("post sucess")
+                          }) // JSON-string from `response.json()` call
+                          .catch(error => console.error(error));
+                    }
+
                     this.setState({
                         status_change_question: true,
                         next_test_quesion: this.next_test_quesion,
@@ -249,6 +300,18 @@ class LoginLayout extends PureComponent {
                         speech_status: 'Stop Listening'
                     });
                     this.send(recognized);
+                    this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                        question_id: parseInt(this.current_question, 10) + 1,
+                        session_id: this.session_id,
+                        student_answer: recognized,
+                        test_level: 'starter',
+                        date: today,
+                        time: time
+                    })
+                      .then(data => {
+                          console.log("post sucess")
+                      }) // JSON-string from `response.json()` call
+                      .catch(error => console.error(error));
                 }
             }else{
                 this.setState({
@@ -301,6 +364,9 @@ class LoginLayout extends PureComponent {
     }
 
 
+
+
+
     checkPronunciation(blob, input_text) {
         var filename = new Date().toISOString();
         var fd=new FormData();
@@ -313,6 +379,19 @@ class LoginLayout extends PureComponent {
 
               let score = data.text_score.quality_score;
 
+              this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                  question_id: this.current_question,
+                  session_id: this.session_id,
+                  pronun_word: this.pronunciation_text,
+                  point: score,
+                  test_level: 'pronunciation',
+                  date: today,
+                  time: time
+              })
+                .then(data => {
+                    console.log("post sucess")
+                }) // JSON-string from `response.json()` call
+                .catch(error => console.error(error));
 
               let text_new = "";
               if (score >= 80){
@@ -343,6 +422,20 @@ class LoginLayout extends PureComponent {
           })
           .catch(error => {
               let score = this.getRndInteger(50, 90);
+
+              this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+                  question_id: this.current_question,
+                  session_id: this.session_id,
+                  pronun_word: this.pronunciation_text,
+                  point: score,
+                  test_level: 'pronunciation',
+                  date: today,
+                  time: time
+              })
+                .then(data => {
+                    console.log("post sucess")
+                }) // JSON-string from `response.json()` call
+                .catch(error => console.error(error));
 
               let text_new = "";
               if (score >= 80){
