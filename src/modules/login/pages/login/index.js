@@ -386,9 +386,9 @@ class LoginLayout extends PureComponent {
 
 
     render() {
-        if (this.state.showTest) {
-            return <TestResult />;
-        }
+        // if (this.state.showTest) {
+        //     return <TestResult />;
+        // }
 
         return (
           <div className="finishHomeWorkWrap py-5 d-flex justify-content-center align-items-center flex-column">
