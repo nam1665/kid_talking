@@ -49,7 +49,8 @@ class LoginLayout extends PureComponent {
         record: false,
         status_pronunciation: false,
         status_change_question: false,
-        open_mic_pronun: false
+        open_mic_pronun: false,
+        speech_status: "Stop Listening"
 
     };
     show = false;
@@ -245,14 +246,14 @@ class LoginLayout extends PureComponent {
                 else {
                     this.setState({
                         speech_result_final: recognized,
-                        speech_status: 'speech sent'
+                        speech_status: 'Stop Listening'
                     });
                     this.send(recognized);
                 }
             }else{
                 this.setState({
                     speech_result: recognized,
-                    speech_status: 'not stopped yet'
+                    speech_status: 'Listening'
                 });
             }
         });
@@ -414,7 +415,10 @@ class LoginLayout extends PureComponent {
 
           <div className="lesson_copy" style={divStyle}>
               <div className="">
-                  <div className="title">Speak Status: {this.state.speech_status}</div>
+                  {/*<div className="title">Speak Status: {this.state.speech_status}</div>*/}
+                  <button hidden={this.state.speech_status == "Stop Listening"}>
+                      <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
+                  </button>
               </div>
           </div>
 
@@ -427,10 +431,18 @@ class LoginLayout extends PureComponent {
             zIndex: 999999
         };
 
+
         return (
           <div className="javis" style={divStyle}>
-              <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
-              <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
+
+              <button disabled={this.state.artyomActive} onClick={this.startAssistant}>
+                  <img src={'https://img.icons8.com/ios/2x/block-microphone-filled.png'} alt="" style={{ width: 50 }} />
+              </button>
+              <button disabled={!this.state.artyomActive} onClick={this.startAssistant}>
+                  <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
+              </button>
+              {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
+              {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
               <div className="hidden" style={divStyle} hidden>
                   <ReactMic
                     record={this.state.record}
@@ -440,7 +452,7 @@ class LoginLayout extends PureComponent {
                   <button onTouchTap={this.stopRecording} type="button">Stop</button>
               </div>
               <button onClick={this.next_question_click}>
-                  Next Question
+                  <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
               </button>
           </div>
         )
