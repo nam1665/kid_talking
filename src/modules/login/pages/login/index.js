@@ -120,7 +120,7 @@ class LoginLayout extends PureComponent {
         // this.startAssistant();
         this.startAssistant();
         //trigger dialogflow for starter test
-        this.send(pronun_start);
+        this.send(starter_triger);
     }
 
     postData(url = '', data, type='json') {
@@ -304,23 +304,21 @@ class LoginLayout extends PureComponent {
         let speech = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(speech);
         speech.onend = () => {
-
             if (this.state.status_pronunciation){
                 this.startRecording();
             }
-
-            if (this.state.status_change_question){
-                this.send(this.state.next_test_quesion);
-            }
-            this.setState({
-                status_change_question: false
-            });
-
-            if(this.state.text.includes("Native Speaker")) {
-                this.send(this.state.next_pronun_question);
-            }
-            this.startAssistant();
         };
+        if (this.state.status_change_question){
+            this.send(this.state.next_test_quesion);
+        }
+        this.setState({
+            status_change_question: false
+        });
+
+        if(this.state.text.includes("Native Speaker")) {
+            this.send(this.state.next_pronun_question);
+        }
+
     }
 
     next_question_click = () => {
