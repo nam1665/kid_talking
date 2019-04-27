@@ -25,7 +25,6 @@ var starter_triger = 'start_trigger';
 var pronun_start = "pronun_trigger_1";
 
 class LoginLayout extends PureComponent {
-
     constructor (props, context){
         super(props, context);
 
@@ -49,7 +48,8 @@ class LoginLayout extends PureComponent {
         jarvis_say: '',
         record: false,
         status_pronunciation: false,
-        status_change_question: false
+        status_change_question: false,
+        open_mic_pronun: false
 
     };
     show = false;
@@ -62,12 +62,7 @@ class LoginLayout extends PureComponent {
     current_question = "";
 
     componentDidMount() {
-        // this.startAssistant();
-        this.startAssistant();
-
-        //trigger dialogflow for starter test
-        this.send(pronun_start);
-
+        this.send(starter_triger);
     }
 
     postData(url = '', data, type='json') {
@@ -96,10 +91,11 @@ class LoginLayout extends PureComponent {
 
 
     send(q) {
-
+        this.stopAssistant();
         this.setState({
-            status_pronunciation: false
-        })
+            status_pronunciation: false,
+            status_change_question: false
+        });
         this.postData('https://ai.kidtopi.com/gateway/?format=true', {
             q: q,
             session_id: this.session_id,
@@ -166,7 +162,7 @@ class LoginLayout extends PureComponent {
                 }
 
                 console.log("next pronun question is " + this.state.next_pronun_question);
-                console.log("status question is " + this.state.status_pronunciation);
+                console.log("status pronun question is " + this.state.status_pronunciation);
                 console.log("student total point is " + this.state.student_total_point);
 
             }
@@ -183,24 +179,33 @@ class LoginLayout extends PureComponent {
                 text: text_new
             })
         }
-        if(this.state.status_pronunciation == false){
-            this.stopAssistant();
+        if(this.state.status_pronunciation){
+            this.pronun_textToSpeech(text_new);
         }
-        // this.stopAssistant();
-
-        this.textToSpeech(this.state.text);
-
+        else{
+            this.textToSpeech(text_new)
+        }
     }
 
+
+    pronun_textToSpeech(pronun_text) {
+        let speech = new SpeechSynthesisUtterance(pronun_text);
+        window.speechSynthesis.speak(speech);
+        speech.onend = () => {
+            this.startRecording();
+            if(this.state.text.includes("Native Speaker")) {
+                this.send(this.state.next_pronun_question);
+            }
+
+        };
+    }
 
     textToSpeech(text) {
         let speech = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(speech);
         speech.onend = () => {
 
-            if (this.state.status_pronunciation){
-                this.startRecording();
-            }
+            this.startAssistant();
 
             if (this.state.status_change_question){
                 this.send(this.state.next_test_quesion);
@@ -209,10 +214,6 @@ class LoginLayout extends PureComponent {
                 status_change_question: false
             });
 
-            if(this.state.text.includes("Native Speaker")) {
-                this.send(this.state.next_pronun_question);
-            }
-            this.startAssistant();
         };
     }
 
@@ -220,18 +221,11 @@ class LoginLayout extends PureComponent {
 
         let _this = this;
 
-        console.log("Artyom succesfully started !");
-
         Jarvis.initialize({
-            lang: "en-US",
             debug: true,
             continuous: true,
-            soundex: true,
             listen: true
         }).then(() => {
-            // Display loaded commands in the console
-            console.log(Jarvis.getAvailableCommands());
-
             _this.setState({
                 artyomActive: true
             });
@@ -244,23 +238,22 @@ class LoginLayout extends PureComponent {
                 if (this.state.status_pronunciation){
                     this.setState({
                         speech_result_final: recognized
-                    })
+                    });
                     this.stopRecording();
+                    this.stopAssistant();
                 }
                 else {
                     this.setState({
                         speech_result_final: recognized,
                         speech_status: 'speech sent'
-                    })
+                    });
                     this.send(recognized);
                 }
             }else{
                 this.setState({
                     speech_result: recognized,
                     speech_status: 'not stopped yet'
-                })
-                console.log(recognized)
-
+                });
             }
         });
 
@@ -268,7 +261,6 @@ class LoginLayout extends PureComponent {
 
         let CommandsManager = new ArtyomCommandsManager(Jarvis);
         CommandsManager.loadCommands();
-
 
     }
 
@@ -295,14 +287,13 @@ class LoginLayout extends PureComponent {
         this.setState({
             record: true
         });
-    }
+    };
 
     stopRecording = () => {
         this.setState({
             record: false
         });
-    }
-
+    };
 
     getRndInteger(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
@@ -342,7 +333,8 @@ class LoginLayout extends PureComponent {
                   });
               }
 
-              this.textToSpeech(text_new);
+              this.pronun_textToSpeech(text_new);
+
               this.setState({
                   text: text_new,
                   status_pronunciation: false
@@ -370,7 +362,7 @@ class LoginLayout extends PureComponent {
                       image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
                   });
               }
-              this.textToSpeech(text_new);
+              this.pronun_textToSpeech(text_new);
               this.setState({
                   text: text_new,
                   status_pronunciation: false
@@ -383,7 +375,7 @@ class LoginLayout extends PureComponent {
     onStop= (blobObject) => {
         console.log('recordedBlob is: ', blobObject);
         this.checkPronunciation(blobObject.blob, this.pronunciation_text);
-    }
+    };
 
     next_question_click = () => {
         if (this.state.status_change_question){
@@ -392,7 +384,7 @@ class LoginLayout extends PureComponent {
         if(this.state.status_pronunciation){
             this.send(this.state.next_pronun_question);
         }
-    }
+    };
 
 
     renderQuestion() {
