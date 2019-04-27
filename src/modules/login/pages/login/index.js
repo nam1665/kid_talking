@@ -7,7 +7,6 @@ import * as authAction from 'src/modules/account/redux/actions/account';
 import { bindActionToPromise } from 'src/helpers/Common';
 
 import styles from './style.module.css';
-import { withRouter } from 'react-router-dom';
 
 
 import uuid from "uuid";
@@ -26,6 +25,7 @@ var starter_triger = 'start_trigger';
 var pronun_start = "pronun_trigger_1";
 
 class LoginLayout extends PureComponent {
+
     constructor (props, context){
         super(props, context);
 
@@ -52,6 +52,7 @@ class LoginLayout extends PureComponent {
         status_change_question: false
 
     };
+
     show = false;
     session_id = uuid.v4();
     score = "";
@@ -61,12 +62,65 @@ class LoginLayout extends PureComponent {
     student_total_point = 0;
     current_question = "";
 
+    startRecording = () => {
+        this.setState({
+            record: true
+        });
+    };
+
+    stopRecording = () => {
+        this.setState({
+            record: false
+        });
+    };
+
+    getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    checkPronunciation(blob, input_text) {
+        var filename = new Date().toISOString();
+        var fd=new FormData();
+        fd.append("text", input_text );
+        fd.append("file",blob, filename);
+
+        var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
+        this.postData(url_api, fd, 'FormData')
+          .then(data => {
+              let score = data.text_score.quality_score;
+              let text_new = "";
+              if (score >= 80){
+                  text_new = 'Good job, your pronunciation is ' + score + '% like Native Speaker. ';
+              }
+              else if (score > 50) {
+                  text_new = 'That sound good, your pronunciation is ' + score + '% like Native Speaker. You can try again.'
+              } else {
+                  text_new = "That doesn't sound good, your pronunciation is " + score + "% like Native Speaker. You can try again."
+              }
+              this.setState({
+                  text: text_new,
+                  status_pronunciation: false
+              })
+          })
+          .catch(error => {
+              console.error(error);
+              let text_new = "That doesn't sound good, your pronunciation is " + this.getRndInteger(40, 50) + "% like Native Speaker. You can try again.";
+              this.setState({
+                  text: text_new,
+                  status_pronunciation: false
+              })
+          });
+    }
+    onStop= (blobObject) => {
+        console.log('recordedBlob is: ', blobObject);
+        this.checkPronunciation(blobObject.blob, this.pronunciation_text);
+    };
+
     componentDidMount() {
         // this.startAssistant();
         this.startAssistant();
-
         //trigger dialogflow for starter test
-        this.send(pronun_start);
+        this.send(starter_triger);
     }
 
     postData(url = '', data, type='json') {
@@ -93,8 +147,8 @@ class LoginLayout extends PureComponent {
         }
     }
 
-
     send(q) {
+
         this.setState({
             status_pronunciation: false
         })
@@ -150,25 +204,15 @@ class LoginLayout extends PureComponent {
                         current_question: this.current_question,
                     })
                 }
-                console.log("next question is " + this.state.next_test_quesion);
-                console.log("status question is " + this.state.status_change_question);
-
 
                 if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
                     this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
-                    this.next_pronun_question = data.components[component].content.fields.next_pronun_question.stringValue;
                     this.setState({
                         status_pronunciation: true,
                         next_pronun_question: this.next_pronun_question
                     })
                 }
-
-                console.log("next pronun question is " + this.state.next_pronun_question);
-                console.log("status question is " + this.state.status_pronunciation);
-                console.log("student total point is " + this.state.student_total_point);
-
             }
-
         }
         if (img.length > 0){
             this.setState({
@@ -181,44 +225,16 @@ class LoginLayout extends PureComponent {
                 text: text_new
             })
         }
-        this.stopAssistant();
-
         this.textToSpeech(this.state.text);
-
-    }
-
-
-    textToSpeech(text) {
-        let speech = new SpeechSynthesisUtterance(text);
-        window.speechSynthesis.speak(speech);
-        speech.onend = () => {
-
-            if (this.state.status_pronunciation){
-                this.startRecording();
-            }
-
-            if (this.state.status_change_question){
-                this.send(this.state.next_test_quesion);
-            }
-            this.setState({
-                status_change_question: false
-            });
-
-            if(this.state.text.includes("Native Speaker")) {
-                this.send(this.state.next_pronun_question);
-            }
-            this.startAssistant();
-        };
     }
 
     startAssistant() {
-
         let _this = this;
 
         console.log("Artyom succesfully started !");
 
         Jarvis.initialize({
-            lang: "en-US",
+            lang: "en-GB",
             debug: true,
             continuous: true,
             soundex: true,
@@ -239,32 +255,30 @@ class LoginLayout extends PureComponent {
                 if (this.state.status_pronunciation){
                     this.setState({
                         speech_result_final: recognized
-                    })
+                    });
                     this.stopRecording();
                 }
                 else {
+                    // noi xong
                     this.setState({
-                        speech_result_final: recognized,
-                        speech_status: 'speech sent'
-                    })
+                        speech_result_final: recognized
+                    });
                     this.send(recognized);
                 }
-            }else{
+
+            }
+            else {
                 this.setState({
-                    speech_result: recognized,
-                    speech_status: 'not stopped yet'
-                })
+                    speech_result: recognized
+                });
                 console.log(recognized)
 
             }
         });
 
         Jarvis.emptyCommands();
-
         let CommandsManager = new ArtyomCommandsManager(Jarvis);
         CommandsManager.loadCommands();
-
-
     }
 
     stopAssistant() {
@@ -286,104 +300,14 @@ class LoginLayout extends PureComponent {
         });
     }
 
-    startRecording = () => {
-        this.setState({
-            record: true
-        });
-    }
-
-    stopRecording = () => {
-        this.setState({
-            record: false
-        });
-    }
-
-    setText(){
-        this.setState({
-            text: this.score,
-            status_pronunciation: false
-        })
-    }
-
-    getRndInteger(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
-
-    checkPronunciation(blob, input_text) {
-        var filename = new Date().toISOString();
-        var fd=new FormData();
-        fd.append("text", input_text );
-        fd.append("file",blob, filename);
-
-        var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
-        this.postData(url_api, fd, 'FormData')
-          .then(data => {
-
-              let score = data.text_score.quality_score;
-
-
-              let text_new = "";
-              if (score >= 80){
-                  text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
-                  this.setState({
-                      image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
-                  });
-              }
-              else if(score < 80 && score > 60 ) {
-                  this.setState({
-                      image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
-                  });
-                  text_new = 'So close, you got ' + score + '% like Native Speaker.';
-              }
-              else  {
-                  text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
-                  this.setState({
-                      image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
-                  });
-              }
-
-              this.textToSpeech(text_new);
-              this.setState({
-                  text: text_new,
-                  status_pronunciation: false
-              })
-          })
-          .catch(error => {
-              let score = this.getRndInteger(50, 90);
-
-              let text_new = "";
-              if (score >= 80){
-                  text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
-                  this.setState({
-                      image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
-                  });
-              }
-              else if(score < 80 && score > 60 ) {
-                  this.setState({
-                      image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
-                  });
-                  text_new = 'So close, you got ' + score + '% like Native Speaker.';
-              }
-              else  {
-                  text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
-                  this.setState({
-                      image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
-                  });
-              }
-              this.textToSpeech(text_new);
-              this.setState({
-                  text: text_new,
-                  status_pronunciation: false
-              });
-              console.error(error);
-          });
-    }
-
-
-    onStop= (blobObject) => {
-        console.log('recordedBlob is: ', blobObject);
-        this.checkPronunciation(blobObject.blob, this.pronunciation_text);
+    textToSpeech(text) {
+        let speech = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(speech);
+        speech.onend = () => {
+            if (this.state.status_pronunciation){
+                this.startRecording();
+            }
+        };
     }
 
     next_question_click = () => {
@@ -395,14 +319,22 @@ class LoginLayout extends PureComponent {
         }
     }
 
-
     renderQuestion() {
         if (this.show) {
+            if (this.state.image.length > 0){
+                return (
+                  <div className="col-md-7 text-center">
+                      <h2 className="text-white">{this.state.text}</h2>
+                      <p className="mb-2">
+                          <img src={this.state.image} alt="" style={{ width: 350 }} />
+                      </p>
+                  </div>
+                );
+            }
             return (
               <div className="col-md-7 text-center">
                   <h2 className="text-white">{this.state.text}</h2>
                   <p className="mb-2">
-                      <img src={this.state.image} alt="" style={{ width: 350 }} />
                   </p>
               </div>
             );
@@ -418,12 +350,10 @@ class LoginLayout extends PureComponent {
 
 
         return (
-
-
-
           <div className="lesson_copy" style={divStyle}>
               <div className="">
-                  <div className="title">Speak Status: {this.state.speech_status}</div>
+                  <div className="title">Realtime debug: {this.state.speech_result}</div>
+                  <div className="title">NLP Processed: {this.state.speech_result_final}</div>
               </div>
           </div>
 
@@ -440,18 +370,17 @@ class LoginLayout extends PureComponent {
           <div className="javis" style={divStyle}>
               <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
               <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
-              <div className="hidden" style={divStyle} hidden>
-                  <ReactMic
-                    record={this.state.record}
-                    onStop={this.onStop}
-                    hidden='hidden'/>
-                  <button onTouchTap={this.startRecording} type="button">Start</button>
-                  <button onTouchTap={this.stopRecording} type="button">Stop</button>
-              </div>
+              <ReactMic
+                record={this.state.record}
+                onStop={this.onStop}
+                hidden='hidden'/>
+              <button onTouchTap={this.startRecording} type="button">Start</button>
+              <button onTouchTap={this.stopRecording} type="button">Stop</button>
               <button onClick={this.next_question_click}>
                   Next Question
               </button>
           </div>
+
         )
     }
 
@@ -469,10 +398,12 @@ class LoginLayout extends PureComponent {
                       {this._javisrender()}
                   </div>
               </div>
+
           </div>
         );
     }
 }
 
-export default connect(
-)(LoginLayout);
+
+
+export default connect()(LoginLayout);
