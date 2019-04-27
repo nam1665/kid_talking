@@ -26,7 +26,20 @@ var starter_triger = 'start_trigger';
 var pronun_start = "pronun_trigger_1";
 
 class LoginLayout extends PureComponent {
+    constructor (props, context){
+        super(props, context);
 
+        // Add `this` context to the handler functions
+        this.startAssistant = this.startAssistant.bind(this);
+        this.stopAssistant = this.stopAssistant.bind(this);
+
+        // Prepare simple state
+        this.state = {
+            artyomActive: false,
+            artyomIsReading: false
+        };
+
+    }
     state = {
         image: '',
         text: '',
