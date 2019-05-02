@@ -17,6 +17,20 @@ var starter_triger = 'start_trigger';
 
 var pronun_start = "pronun_trigger_1";
 
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth() + 1; //January is 0!
+
+var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+var yyyy = today.getFullYear();
+if (dd < 10) {
+  dd = '0' + dd;
+}
+if (mm < 10) {
+  mm = '0' + mm;
+}
+var today = dd + '/' + mm + '/' + yyyy;
+
 class Layout extends React.PureComponent {
 
   constructor (props, context){
@@ -42,7 +56,9 @@ class Layout extends React.PureComponent {
     jarvis_say: '',
     record: false,
     status_pronunciation: false,
-    status_change_question: false
+    status_change_question: false,
+    open_mic_pronun: false,
+    speech_status: "Stop Listening"
 
   };
   show = false;
@@ -55,12 +71,7 @@ class Layout extends React.PureComponent {
   current_question = "";
 
   componentDidMount() {
-    // this.startAssistant();
-    this.startAssistant();
-
-    //trigger dialogflow for starter test
     this.send(starter_triger);
-
   }
 
   postData(url = '', data, type='json') {
@@ -89,10 +100,11 @@ class Layout extends React.PureComponent {
 
 
   send(q) {
-
+    this.stopAssistant();
     this.setState({
-      status_pronunciation: false
-    })
+      status_pronunciation: false,
+      status_change_question: false
+    });
     this.postData('https://ai.kidtopi.com/gateway/?format=true', {
       q: q,
       session_id: this.session_id,
@@ -131,15 +143,52 @@ class Layout extends React.PureComponent {
           this.student_point = data.components[component].content.fields.student_point.stringValue;
           console.log(this.student_point + "   student point");
           if(this.student_point == "1"){
-            console.log("trueeeee + 1");
-            this.state.student_total_point += 1;
+            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+              question_id: this.current_question,
+              session_id: this.session_id,
+              answer: 'right',
+              point: 1,
+              test_level: 'starter',
+              date: today,
+              time: time
+            })
+              .then(data => {
+                console.log("post sucess")
+              }) // JSON-string from `response.json()` call
+              .catch(error => console.error(error));
           }
           if(this.student_point == "0.5") {
-            console.log("trueeeee + 0.5")
-            this.state.student_total_point += 0.5;
-
+            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+              question_id: this.current_question,
+              session_id: this.session_id,
+              answer: 'right',
+              point: 0.5,
+              test_level: 'starter',
+              date: today,
+              time: time
+            })
+              .then(data => {
+                console.log("post sucess")
+              }) // JSON-string from `response.json()` call
+              .catch(error => console.error(error));
           }
-            this.setState({
+          if(this.student_point == "0") {
+            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+              question_id: this.current_question,
+              session_id: this.session_id,
+              answer: 'wrong',
+              point: 0,
+              test_level: 'starter',
+              date: today,
+              time: time
+            })
+              .then(data => {
+                console.log("post sucess")
+              }) // JSON-string from `response.json()` call
+              .catch(error => console.error(error));
+          }
+
+          this.setState({
             status_change_question: true,
             next_test_quesion: this.next_test_quesion,
             current_question: this.current_question,
@@ -159,7 +208,7 @@ class Layout extends React.PureComponent {
         }
 
         console.log("next pronun question is " + this.state.next_pronun_question);
-        console.log("status question is " + this.state.status_pronunciation);
+        console.log("status pronun question is " + this.state.status_pronunciation);
         console.log("student total point is " + this.state.student_total_point);
 
       }
@@ -176,21 +225,33 @@ class Layout extends React.PureComponent {
         text: text_new
       })
     }
-    this.stopAssistant();
-
-    this.textToSpeech(this.state.text);
-
+    if(this.state.status_pronunciation){
+      this.pronun_textToSpeech(text_new);
+    }
+    else{
+      this.textToSpeech(text_new)
+    }
   }
 
+
+  pronun_textToSpeech(pronun_text) {
+    let speech = new SpeechSynthesisUtterance(pronun_text);
+    window.speechSynthesis.speak(speech);
+    speech.onend = () => {
+      this.startRecording();
+      if(this.state.text.includes("Native Speaker")) {
+        this.send(this.state.next_pronun_question);
+      }
+
+    };
+  }
 
   textToSpeech(text) {
     let speech = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
-      if (this.state.status_pronunciation){
-        this.startRecording();
-      }
+      this.startAssistant();
 
       if (this.state.status_change_question){
         this.send(this.state.next_test_quesion);
@@ -199,10 +260,6 @@ class Layout extends React.PureComponent {
         status_change_question: false
       });
 
-      if(this.state.text.includes("Native Speaker")) {
-        this.send(this.state.next_pronun_question);
-      }
-      this.startAssistant();
     };
   }
 
@@ -210,18 +267,11 @@ class Layout extends React.PureComponent {
 
     let _this = this;
 
-    console.log("Artyom succesfully started !");
-
     Jarvis.initialize({
-      lang: "en-US",
       debug: true,
       continuous: true,
-      soundex: true,
       listen: true
     }).then(() => {
-      // Display loaded commands in the console
-      console.log(Jarvis.getAvailableCommands());
-
       _this.setState({
         artyomActive: true
       });
@@ -234,23 +284,34 @@ class Layout extends React.PureComponent {
         if (this.state.status_pronunciation){
           this.setState({
             speech_result_final: recognized
-          })
+          });
           this.stopRecording();
+          this.stopAssistant();
         }
         else {
           this.setState({
             speech_result_final: recognized,
-            speech_status: 'speech sent'
-          })
+            speech_status: 'Stop Listening'
+          });
           this.send(recognized);
+          this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+            question_id: parseInt(this.current_question, 10) + 1,
+            session_id: this.session_id,
+            student_answer: recognized,
+            test_level: 'starter',
+            date: today,
+            time: time
+          })
+            .then(data => {
+              console.log("post sucess")
+            }) // JSON-string from `response.json()` call
+            .catch(error => console.error(error));
         }
       }else{
         this.setState({
           speech_result: recognized,
-          speech_status: 'not stopped yet'
-        })
-        console.log(recognized)
-
+          speech_status: 'Listening'
+        });
       }
     });
 
@@ -258,7 +319,6 @@ class Layout extends React.PureComponent {
 
     let CommandsManager = new ArtyomCommandsManager(Jarvis);
     CommandsManager.loadCommands();
-
 
   }
 
@@ -285,24 +345,20 @@ class Layout extends React.PureComponent {
     this.setState({
       record: true
     });
-  }
+  };
 
   stopRecording = () => {
     this.setState({
       record: false
     });
-  }
-
-  setText(){
-    this.setState({
-      text: this.score,
-      status_pronunciation: false
-    })
-  }
+  };
 
   getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
+
+
+
 
 
   checkPronunciation(blob, input_text) {
@@ -317,6 +373,19 @@ class Layout extends React.PureComponent {
 
         let score = data.text_score.quality_score;
 
+        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+          question_id: this.current_question,
+          session_id: this.session_id,
+          pronun_word: this.pronunciation_text,
+          point: score,
+          test_level: 'pronunciation',
+          date: today,
+          time: time
+        })
+          .then(data => {
+            console.log("post sucess")
+          }) // JSON-string from `response.json()` call
+          .catch(error => console.error(error));
 
         let text_new = "";
         if (score >= 80){
@@ -338,7 +407,8 @@ class Layout extends React.PureComponent {
           });
         }
 
-        this.textToSpeech(text_new);
+        this.pronun_textToSpeech(text_new);
+
         this.setState({
           text: text_new,
           status_pronunciation: false
@@ -347,6 +417,20 @@ class Layout extends React.PureComponent {
       .catch(error => {
         let score = this.getRndInteger(50, 90);
 
+        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+          question_id: this.current_question,
+          session_id: this.session_id,
+          pronun_word: this.pronunciation_text,
+          point: score,
+          test_level: 'pronunciation',
+          date: today,
+          time: time
+        })
+          .then(data => {
+            console.log("post sucess")
+          }) // JSON-string from `response.json()` call
+          .catch(error => console.error(error));
+
         let text_new = "";
         if (score >= 80){
           text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
@@ -366,7 +450,7 @@ class Layout extends React.PureComponent {
             image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
           });
         }
-        this.textToSpeech(text_new);
+        this.pronun_textToSpeech(text_new);
         this.setState({
           text: text_new,
           status_pronunciation: false
@@ -379,7 +463,7 @@ class Layout extends React.PureComponent {
   onStop= (blobObject) => {
     console.log('recordedBlob is: ', blobObject);
     this.checkPronunciation(blobObject.blob, this.pronunciation_text);
-  }
+  };
 
   next_question_click = () => {
     if (this.state.status_change_question){
@@ -388,7 +472,7 @@ class Layout extends React.PureComponent {
     if(this.state.status_pronunciation){
       this.send(this.state.next_pronun_question);
     }
-  }
+  };
 
 
   renderQuestion() {
@@ -418,12 +502,17 @@ class Layout extends React.PureComponent {
 
       <div className="lesson_copy" style={divStyle}>
         <div className="">
-          <div className="title">Speak Status: {this.state.speech_status}</div>
+          {/*<div className="title">Speak Status: {this.state.speech_status}</div>*/}
+          <button hidden={this.state.speech_status == "Stop Listening"}>
+            <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
+          </button>
         </div>
       </div>
 
     );
   }
+
+
 
   _javisrender() {
 
@@ -431,10 +520,18 @@ class Layout extends React.PureComponent {
       zIndex: 999999
     };
 
+
     return (
       <div className="javis" style={divStyle}>
-        <input type="button" value="Start Listening" disabled={this.state.artyomActive} onClick={this.startAssistant}/>
-        <input type="button" value="Stop Listening" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>
+
+        <button disabled={this.state.artyomActive} onClick={this.startAssistant}>
+          <img src={'https://img.icons8.com/ios/2x/block-microphone-filled.png'} alt="" style={{ width: 50 }} />
+        </button>
+        <button disabled={!this.state.artyomActive} onClick={this.startAssistant}>
+          <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
+        </button>
+        {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
+        {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
         <div className="hidden" style={divStyle} hidden>
           <ReactMic
             record={this.state.record}
@@ -444,7 +541,7 @@ class Layout extends React.PureComponent {
           <button onTouchTap={this.stopRecording} type="button">Stop</button>
         </div>
         <button onClick={this.next_question_click}>
-          Next Question
+          <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
         </button>
       </div>
     )
@@ -465,29 +562,6 @@ class Layout extends React.PureComponent {
           </div>
         </div>
 
-        {/*<div className="text-center">*/}
-        {/*<img style={{ width: '80%' }} src="/images/goodjob.png" alt="" />*/}
-        {/*</div>*/}
-
-        {/*<div className="fz-40 text-white font-weight-bold mt-4 text-center px-5">*/}
-        {/*Cảm ơn bé đã hoàn thành bài kiểm tra,*/}
-        {/*<br /> chúng tôi sẽ liên hệ lại để thông báo kết quả trong thời gian sớm nhất*/}
-        {/*</div>*/}
-
-        {/* <div className="text-center mt-4">
-                    <button
-                        className="btn-3d btn-white btn-rounded fz-26"
-                        style={{ textTransform: 'inherit' }}
-                        onClick={() => {
-                            // this.setState({
-                            //     showTest: !this.state.showTest
-                            // });
-                            this.props.history.push(Route.home);
-                        }}
-                    >
-                        Báo cáo kiểm tra
-                    </button>
-                </div> */}
       </div>
     );
   }
