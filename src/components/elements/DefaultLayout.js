@@ -525,10 +525,10 @@ class Layout extends React.PureComponent {
       <div className="javis" style={divStyle}>
 
         <button disabled={this.state.artyomActive} onClick={this.startAssistant}>
-          <img src={'https://img.icons8.com/ios/2x/block-microphone-filled.png'} alt="" style={{ width: 50 }} />
-        </button>
-        <button disabled={!this.state.artyomActive} onClick={this.startAssistant}>
           <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
+        </button>
+        <button disabled={!this.state.artyomActive} onClick={this.stopAssistant}>
+          <img src={'https://img.icons8.com/ios/2x/block-microphone-filled.png'} alt="" style={{ width: 50 }} />
         </button>
         {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
         {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
