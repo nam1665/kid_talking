@@ -86,7 +86,7 @@ class Layout extends React.PureComponent {
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.send(starter_triger);
+    this.send('question_20_trigger');
   }
 
   postData(url = '', data, type='json') {
@@ -241,9 +241,6 @@ class Layout extends React.PureComponent {
             top_larger: this.top_larger,
             top_smaller: this.top_smaller
           });
-          this.setState({
-            artyomActive: false
-          });
         }
       }
     }
@@ -277,9 +274,7 @@ class Layout extends React.PureComponent {
     speech.onend = () => {
 
       this.startRecording();
-      this.setState({
-        artyomActive: true
-      });
+
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
       }
@@ -302,9 +297,7 @@ class Layout extends React.PureComponent {
       });
 
       if(this.state.status_drag){
-        this.setState({
-          artyomActive: false
-        });
+        this.stopAssistant();
       }
       if(this.state.drag_finish){
         this.setState({
@@ -603,8 +596,8 @@ class Layout extends React.PureComponent {
             record={this.state.record}
             onStop={this.onStop}
             hidden='hidden'/>
-          <button onTouchTap={this.startRecording} type="button">Start</button>
-          <button onTouchTap={this.stopRecording} type="button">Stop</button>
+          <button onClick={this.startRecording} type="button">Start</button>
+          <button onClick={this.stopRecording} type="button">Stop</button>
         </div>
         <button onClick={this.next_question_click}>
           <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
@@ -627,6 +620,8 @@ class Layout extends React.PureComponent {
     this.setState({
       student_move: location_data
     });
+
+    this.stopAssistant();
 
     if(this.state.move_count == 1) {
       if(this.state.student_move){
