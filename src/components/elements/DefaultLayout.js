@@ -50,6 +50,8 @@ class Layout extends React.PureComponent {
     this.stopAssistant = this.stopAssistant.bind(this);
     this.move_counterHanlder = this.move_counterHanlder.bind(this)
     this.studen_move_answerHanlder = this.studen_move_answerHanlder.bind(this)
+    this.studen_reset_move = this.studen_reset_move.bind(this)
+
 
     // Prepare simple state
     this.state = {
@@ -77,16 +79,14 @@ class Layout extends React.PureComponent {
 
   show = false;
   session_id = uuid.v4();
-  score = "";
   pronunciation_text = "";
   next_test_quesion = "";
   next_pronun_question = "";
-  student_total_point = 0;
   current_question = "";
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.send('question_20_trigger');
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
@@ -211,6 +211,7 @@ class Layout extends React.PureComponent {
         }
 
         if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
+          this.stopAssistant();
           this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
           this.next_pronun_question = data.components[component].content.fields.next_pronun_question.stringValue;
           this.setState({
@@ -257,9 +258,6 @@ class Layout extends React.PureComponent {
     }
     if(this.state.status_pronunciation){
       this.pronun_textToSpeech(text_new);
-      this.setState({
-        artyomActive: true
-      });
     }
     else{
       this.textToSpeech(text_new)
@@ -273,10 +271,55 @@ class Layout extends React.PureComponent {
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
-      this.startRecording();
+      this.startAssistant();
+      setTimeout(
+        function() {
+          this.startRecording();
+        }
+          .bind(this),
+        1000
+      );
+
 
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
+      }
+
+      if(this.state.text.includes("repeat after me")) {
+        // this.startAssistant();
+      }
+
+    };
+  }
+
+
+  drag_textToSpeech(drag_text) {
+    let speech = new SpeechSynthesisUtterance(drag_text);
+    window.speechSynthesis.speak(speech);
+    speech.onend = () => {
+
+      if(this.state.drag_finish){
+        this.setState({
+          status_drag: false,
+          hidepicture: false,
+          drag_finish: false,
+          move_count: 0,
+          student_move: false,
+          end_drag: false
+        });
+        this.send(this.state.next_test_quesion);
+      }
+
+      if(this.state.text.includes("the lamp and the door")) {
+        this.setState({
+          artyomActive: false
+        });
+      }
+
+      if(this.state.text.includes("under the table")) {
+        this.setState({
+          artyomActive: false
+        });
       }
 
     };
@@ -296,19 +339,20 @@ class Layout extends React.PureComponent {
         status_change_question: false
       });
 
-      if(this.state.status_drag){
+      if(this.state.status_drag) {
         this.stopAssistant();
       }
-      if(this.state.drag_finish){
+
+      if(this.state.text.includes("the lamp and the door")) {
         this.setState({
-          status_drag: false,
-          hidepicture: false,
-          drag_finish: false,
-          move_count: 0,
-          student_move: false,
-          end_drag: false
+          artyomActive: false
         });
-        this.send(this.state.next_test_quesion);
+      }
+
+      if(this.state.text.includes("under the table")) {
+        this.setState({
+          artyomActive: false
+        });
       }
 
     };
@@ -589,6 +633,12 @@ class Layout extends React.PureComponent {
         <button disabled={!this.state.artyomActive} onClick={this.stopAssistant}>
           <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
         </button>
+        <div>
+          <button onClick={this.next_question_click}>
+            <text>Please click it when the test is frozen</text>
+            <img src={'https://thumbs.gfycat.com/WellinformedRealisticConch-small.gif'} alt="" style={{ width: 50 }} />
+          </button>
+        </div>
         {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
         {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
         <div className="hidden" style={divStyle} hidden>
@@ -599,10 +649,9 @@ class Layout extends React.PureComponent {
           <button onClick={this.startRecording} type="button">Start</button>
           <button onClick={this.stopRecording} type="button">Stop</button>
         </div>
-        <button onClick={this.next_question_click}>
-          <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
-        </button>
       </div>
+
+
     )
   }
 
@@ -613,6 +662,14 @@ class Layout extends React.PureComponent {
       move_count: dataFromChild
     });
 
+  }
+
+  studen_reset_move(dataFromChild) {
+    // log our state before and after we updated it
+    this.setState({
+      reset_move: dataFromChild
+    });
+    console.log("reset move from child   " + this.state.reset_move)
   }
 
   studen_move_answerHanlder(location_data) {
@@ -629,9 +686,10 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          end_drag: true
+          drag_finish: true,
+          reset_move: true
         });
-        this.textToSpeech(text_new);
+        this.drag_textToSpeech(text_new);
 
       }
       else{
@@ -640,7 +698,7 @@ class Layout extends React.PureComponent {
           text: text_new,
           on_dragging: true
         });
-        this.textToSpeech(text_new)
+        this.drag_textToSpeech(text_new)
       }
     }
     if(this.state.move_count == 2) {
@@ -649,9 +707,10 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          end_drag: true
+          drag_finish: true,
+          reset_move: true
         });
-        this.textToSpeech(text_new);
+        this.drag_textToSpeech(text_new);
 
       }
       else{
@@ -660,7 +719,7 @@ class Layout extends React.PureComponent {
           text: text_new,
           on_dragging: true
         });
-        this.textToSpeech(text_new)
+        this.drag_textToSpeech(text_new)
       }
     }
     if(this.state.move_count == 3) {
@@ -669,28 +728,28 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          end_drag: true
+          drag_finish: true,
+          reset_move: true
         });
-        this.textToSpeech(text_new);
+        this.drag_textToSpeech(text_new);
 
       }
       else{
-        let text_new = "Oops, still wrong, let try it next time";
+        let text_new = "Oops, still wrong, try next time, now let move to the new question";
         this.setState({
           text: text_new,
           on_dragging: false,
-          end_drag: true
+          drag_finish: true,
+          reset_move: true,
         });
-        this.textToSpeech(text_new);
+        this.drag_textToSpeech(text_new);
 
       }
     }
 
     this.setState({
-      drag_finish: this.state.end_drag
+      drag_finish: this.state.drag_finish
     });
-
-    console.log(this.state.drag_finish)
 
   }
 
@@ -703,12 +762,14 @@ class Layout extends React.PureComponent {
           <Container
             background_img = {this.state.background_img}
             object_img={this.state.object_img}
+            reset_move = {this.state.reset_move}
             left_larger={this.state.left_larger}
             left_smaller={this.state.left_smaller}
             top_larger={this.state.top_larger}
             top_smaller={this.state.top_smaller}
             action={this.move_counterHanlder}
             action2={this.studen_move_answerHanlder}
+            action3={this.studen_reset_move}
 
           />
         </DragDropContextProvider>

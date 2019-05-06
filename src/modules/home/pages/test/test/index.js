@@ -81,7 +81,7 @@ class TestLayout extends React.Component {
 
                                 question.componentType = getQuestionTypes(question);
 
-                                // question.componentType = 'StarterNine';
+                                // question.componentType = 'SDropText';
 
                                 // console.log(question);
 

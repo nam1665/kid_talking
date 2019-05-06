@@ -11,10 +11,10 @@ class Container extends React.Component {
     super(...arguments);
     this.handleClick = this.handleClick.bind(this);
     this.student_move_answer = this.student_move_answer.bind(this);
+    this.studen_reset_move = this.studen_reset_move.bind(this);
 
     this.state = {
       student_move: false,
-      drag_finish: false,
       move_counter: 0,
       boxes: {
         a: { top: 0, left: 10 }
@@ -27,7 +27,8 @@ class Container extends React.Component {
     left_larger: 10,
     left_smaller: 100,
     top_larger: 20,
-    top_smaller: 500
+    top_smaller: 500,
+    drag_finish: false
   };
 
   componentWillReceiveProps(){
@@ -37,8 +38,14 @@ class Container extends React.Component {
       left_larger: this.props.left_larger,
       left_smaller: this.props.left_smaller,
       top_larger: this.props.top_larger,
-      top_smaller: this.props.top_smaller
+      top_smaller: this.props.top_smaller,
+      reset_move: this.props.reset_move
+
     });
+    console.log(this.state.reset_move);
+    if(this.state.reset_move){
+      move_count = 0;
+    }
 
   }
   render() {
@@ -70,6 +77,7 @@ class Container extends React.Component {
               <img src={this.state.object_img} alt="" style={{ width: 50, position:'absolute' }} />
               <button style={{display: 'none'}} onClick={this.handleClick}></button>
               <button style={{display: 'none'}} onClick={this.student_move_answer}></button>
+              <button style={{display: 'none'}} onClick={this.studen_reset_move}></button>
 
             </Box>
 
@@ -95,6 +103,12 @@ class Container extends React.Component {
     });
   }
 
+  studen_reset_move () {
+    this.props.action3(this.state.reset_move);
+    this.setState({
+      reset_move: false,
+    });
+  }
 
 
   moveBox(id, left, top) {
@@ -107,15 +121,17 @@ class Container extends React.Component {
         },
       }),
     );
-    if(move_count == 3){
-      move_count = 0;
-    } else {
-      move_count += 1;
-    }
+
+
     if (left > this.state.left_larger && left < this.state.left_smaller){
       if(top > this.state.top_larger && top < this.state.top_smaller){
         this.setState({
           student_move: true
+        });
+      }
+      else{
+        this.setState({
+          student_move: false
         });
       }
     }
@@ -124,13 +140,29 @@ class Container extends React.Component {
         student_move: false
       });
     }
+
+    move_count += 1;
+
+    if(move_count > 3 ){
+      move_count = 0;
+    }
+
     this.setState({
-      move_counter: move_count
+      move_counter: move_count,
     });
+
     this.handleClick();
-    this.student_move_answer()
+    this.student_move_answer();
+
+    if(this.state.reset_move){
+      this.studen_reset_move();
+    }
 
     console.log(left + "   " + top)
+    console.log(this.state.move_counter)
+
+    console.log(this.state.top_larger + " largerr top")
+    console.log(this.state.top_smaller + "  saller top")
 
   }
 
