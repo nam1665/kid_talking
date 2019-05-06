@@ -275,7 +275,11 @@ class Layout extends React.PureComponent {
     let speech = new SpeechSynthesisUtterance(pronun_text);
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
+
       this.startRecording();
+      this.setState({
+        artyomActive: true
+      });
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
       }
