@@ -260,6 +260,9 @@ class Layout extends React.PureComponent {
     }
     if(this.state.status_pronunciation){
       this.pronun_textToSpeech(text_new);
+      this.setState({
+        artyomActive: true
+      });
     }
     else{
       this.textToSpeech(text_new)
@@ -295,7 +298,9 @@ class Layout extends React.PureComponent {
       });
 
       if(this.state.status_drag){
-        this.stopAssistant();
+        this.setState({
+          artyomActive: false
+        });
       }
       if(this.state.drag_finish){
         this.setState({
@@ -517,16 +522,16 @@ class Layout extends React.PureComponent {
   };
 
   next_question_click = () => {
-    if (this.state.status_change_question){
-      this.send(this.state.next_test_quesion);
-    }
+
     if(this.state.status_pronunciation){
       this.send(this.state.next_pronun_question);
     }
-
     else {
       this.send(this.state.next_test_quesion);
+
     }
+
+
 
   };
 
@@ -537,7 +542,7 @@ class Layout extends React.PureComponent {
         <div className="col-md-7 text-center">
           <h2 className="text-white">{this.state.text}</h2>
           <p className="mb-2">
-            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 700 }} />
+            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 650 }} />
           </p>
         </div>
       );
