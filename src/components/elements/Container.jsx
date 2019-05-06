@@ -14,6 +14,7 @@ class Container extends React.Component {
 
     this.state = {
       student_move: false,
+      drag_finish: false,
       move_counter: 0,
       boxes: {
         a: { top: 0, left: 10 }
@@ -23,13 +24,22 @@ class Container extends React.Component {
   state = {
     background_img: '',
     object_img: '',
+    left_larger: 10,
+    left_smaller: 100,
+    top_larger: 20,
+    top_smaller: 500
   };
 
   componentWillReceiveProps(){
     this.setState({
       background_img: this.props.background_img,
-      object_img: this.props.object_img
+      object_img: this.props.object_img,
+      left_larger: this.props.left_larger,
+      left_smaller: this.props.left_smaller,
+      top_larger: this.props.top_larger,
+      top_smaller: this.props.top_smaller
     });
+
   }
   render() {
     const styles = {
@@ -97,9 +107,13 @@ class Container extends React.Component {
         },
       }),
     );
-    move_count += 1;
-    if (left > 350 && left < 500){
-      if(top > 300 && top < 400){
+    if(move_count == 3){
+      move_count = 0;
+    } else {
+      move_count += 1;
+    }
+    if (left > this.state.left_larger && left < this.state.left_smaller){
+      if(top > this.state.top_larger && top < this.state.top_smaller){
         this.setState({
           student_move: true
         });
@@ -115,6 +129,9 @@ class Container extends React.Component {
     });
     this.handleClick();
     this.student_move_answer()
+
+    console.log(left + "   " + top)
+
   }
 
 }
