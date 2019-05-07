@@ -87,6 +87,7 @@ class Layout extends React.PureComponent {
   object_img = "";
   componentDidMount() {
     this.send(starter_triger);
+    this.startAssistant();
   }
 
   postData(url = '', data, type='json') {
@@ -168,7 +169,6 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
-                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -183,7 +183,6 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
-                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -198,7 +197,6 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
-                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -407,7 +405,6 @@ class Layout extends React.PureComponent {
             time: time
           })
             .then(data => {
-              console.log("post sucess")
             }) // JSON-string from `response.json()` call
             .catch(error => console.error(error));
         }
@@ -487,7 +484,6 @@ class Layout extends React.PureComponent {
           time: time
         })
           .then(data => {
-            console.log("post sucess")
           }) // JSON-string from `response.json()` call
           .catch(error => console.error(error));
 
@@ -531,7 +527,6 @@ class Layout extends React.PureComponent {
           time: time
         })
           .then(data => {
-            console.log("post sucess")
           }) // JSON-string from `response.json()` call
           .catch(error => console.error(error));
 
@@ -574,7 +569,6 @@ class Layout extends React.PureComponent {
     var url_api = "https://ai.kidtopi.com/api/v1/storage_file/";
     this.postData(url_api, fd, 'FormData')
       .then(data => {
-        console.log("upload file success");
       })
       .catch(error => {
         console.error(error);

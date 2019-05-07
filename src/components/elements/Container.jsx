@@ -162,12 +162,6 @@ class Container extends React.Component {
       this.studen_reset_move();
     }
 
-    console.log(left + "   " + top)
-    console.log(this.state.move_counter)
-
-    console.log(this.state.top_larger + " largerr top")
-    console.log(this.state.top_smaller + "  saller top")
-
   }
 
 }
