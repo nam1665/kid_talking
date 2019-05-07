@@ -588,10 +588,10 @@ class Layout extends React.PureComponent {
       .then(data => {
         let student_point_final = data.sum;
         let text_new = "";
-        if(student_point_final < 7 ){
+        if(student_point_final < 12 ){
           text_new = "Your score is " + student_point_final/10*22 + " . Your result is not good, but don't worry, let's practice more, it will be better";
         }
-        else if (student_point_final < 16) {
+        else if (student_point_final < 17) {
           text_new = "Your score is " + student_point_final/10*22 + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
 
         }
@@ -817,7 +817,8 @@ class Layout extends React.PureComponent {
         point: 1,
         test_level: 'starter',
         date: today,
-        time: time
+        time: time,
+        student_answer: 'drag n drop question'
       })
         .then(data => {
         }) // JSON-string from `response.json()` call
