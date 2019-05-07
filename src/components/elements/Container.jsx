@@ -42,7 +42,6 @@ class Container extends React.Component {
       reset_move: this.props.reset_move
 
     });
-    console.log(this.state.reset_move);
     if(this.state.reset_move){
       move_count = 0;
     }
