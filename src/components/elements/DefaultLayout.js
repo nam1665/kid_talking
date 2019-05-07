@@ -592,7 +592,14 @@ class Layout extends React.PureComponent {
     }
     else {
       this.send(this.state.next_test_quesion);
-
+      this.setState({
+        status_drag: false,
+        hidepicture: false,
+        drag_finish: false,
+        move_count: 0,
+        student_move: false,
+        end_drag: false
+      });
     }
 
 
