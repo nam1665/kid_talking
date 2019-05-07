@@ -240,6 +240,11 @@ class Layout extends React.PureComponent {
             top_smaller: this.top_smaller
           });
         }
+
+        if (data.components[component].content.fields.hasOwnProperty('show_score')){
+          this.get_test_result(this.session_id);
+        }
+
       }
     }
     if (img.length > 0){
@@ -574,6 +579,33 @@ class Layout extends React.PureComponent {
       });
   }
 
+  get_test_result(session_id) {
+    var fd=new FormData();
+    fd.append("session_id", session_id );
+
+    var url_api = "https://ai.kidtopi.com/get_result_speaking_test/";
+    this.postData(url_api, fd, 'FormData')
+      .then(data => {
+        let student_point_final = data.sum;
+        let text_new = "";
+        if(student_point_final < 7 ){
+          text_new = "Your score is " + student_point_final/10*22 + " . Your result is not good, but don't worry, let's practice more, it will be better";
+        }
+        else if (student_point_final < 16) {
+          text_new = "Your score is " + student_point_final/10*22 + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
+
+        }
+        else {
+          text_new = "Your score is " + student_point_final/10*22 +  " . Excellent job, I'm proud of you, your mother proud of you, your bros proud of you, everyone proud of you";
+        }
+        this.textToSpeech(text_new);
+        console.log("test point", data.sum);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
 
   onStop= (blobObject) => {
     console.log('recordedBlob is: ', blobObject);
@@ -775,6 +807,21 @@ class Layout extends React.PureComponent {
         this.drag_textToSpeech(text_new);
 
       }
+    }
+
+    if(this.state.student_move){
+      this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
+        question_id: this.current_question,
+        session_id: this.session_id,
+        answer: 'right',
+        point: 1,
+        test_level: 'starter',
+        date: today,
+        time: time
+      })
+        .then(data => {
+        }) // JSON-string from `response.json()` call
+        .catch(error => console.error(error));
     }
 
     this.setState({
