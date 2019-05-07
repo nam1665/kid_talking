@@ -86,7 +86,7 @@ class Layout extends React.PureComponent {
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.send('question_22_trigger');
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
