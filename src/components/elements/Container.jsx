@@ -143,6 +143,10 @@ class Container extends React.Component {
 
     move_count += 1;
 
+    this.setState({
+      reset_move: false,
+    });
+
     if(move_count > 3 ){
       move_count = 0;
     }

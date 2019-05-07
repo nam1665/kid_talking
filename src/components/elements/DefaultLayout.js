@@ -86,7 +86,7 @@ class Layout extends React.PureComponent {
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.send(starter_triger);
+    this.send('question_22_trigger');
   }
 
   postData(url = '', data, type='json') {
@@ -285,10 +285,6 @@ class Layout extends React.PureComponent {
         this.send(this.state.next_pronun_question);
       }
 
-      if(this.state.text.includes("repeat after me")) {
-        // this.startAssistant();
-      }
-
     };
   }
 
@@ -331,6 +327,13 @@ class Layout extends React.PureComponent {
     speech.onend = () => {
 
       this.startAssistant();
+      setTimeout(
+        function() {
+          this.startRecording();
+        }
+          .bind(this),
+        800
+      );
 
       if (this.state.status_change_question){
         this.send(this.state.next_test_quesion);
@@ -389,6 +392,10 @@ class Layout extends React.PureComponent {
           this.setState({
             speech_result_final: recognized,
             speech_status: 'Stop Listening'
+          });
+          this.stopRecording();
+          this.setState({
+            artyomActive: false
           });
           this.send(recognized);
           this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
@@ -556,10 +563,33 @@ class Layout extends React.PureComponent {
       });
   }
 
+  upload_recordfile(blob, session_id, question_id) {
+    var filename = new Date().toISOString();
+    var fd=new FormData();
+    fd.append("file",blob, filename);
+    fd.append("session_id", session_id );
+    fd.append("info", question_id);
+
+
+    var url_api = "https://ai.kidtopi.com/api/v1/storage_file/";
+    this.postData(url_api, fd, 'FormData')
+      .then(data => {
+        console.log("upload file success");
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
 
   onStop= (blobObject) => {
     console.log('recordedBlob is: ', blobObject);
-    this.checkPronunciation(blobObject.blob, this.pronunciation_text);
+    if (this.state.status_pronunciation) {
+      this.checkPronunciation(blobObject.blob, this.pronunciation_text);
+    }
+    else {
+      this.upload_recordfile(blobObject.blob, this.session_id, this.state.current_question);
+    }
   };
 
   next_question_click = () => {
