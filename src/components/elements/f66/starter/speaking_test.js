@@ -86,7 +86,7 @@ class Layout extends React.PureComponent {
   object_img = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send('pronun_trigger_4');
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
