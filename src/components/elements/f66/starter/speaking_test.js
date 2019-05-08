@@ -84,7 +84,8 @@ class Layout extends React.PureComponent {
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.send('question_22_trigger');
+    this.stopAssistant();
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
@@ -569,17 +570,19 @@ class Layout extends React.PureComponent {
         let student_point_final = data.sum;
         let text_new = "";
         if(student_point_final < 12 ){
-          text_new = "Your score is " + student_point_final/10*22 + " . Your result is not good, but don't worry, let's practice more, it will be better";
+          text_new = "Your score is " + student_point_final + "/22" + " . Your result is not good, but don't worry, let's practice more, it will be better";
         }
         else if (student_point_final < 17) {
-          text_new = "Your score is " + student_point_final/10*22 + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
+          text_new = "Your score is " + student_point_final + "/22" + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
 
         }
         else {
-          text_new = "Your score is " + student_point_final/10*22 +  " . Excellent job, I'm proud of you, your mother proud of you, your bros proud of you, everyone proud of you";
+          text_new = "Your score is " + student_point_final + "/22" +  " . Excellent job, I'm proud of you, your mother proud of you, your bros proud of you, everyone proud of you";
         }
         this.textToSpeech(text_new);
-        console.log("test point", data.sum);
+        this.setState({
+          text: text_new
+        });
       })
       .catch(error => {
         console.error(error);
