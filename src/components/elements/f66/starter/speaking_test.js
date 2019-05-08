@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom';
 
 import uuid from "uuid";
 import { ReactMic } from 'react-mic';
-import Container from './Container'
+import Container from '../../Container'
 
 
 import Artyom from 'artyom.js';
