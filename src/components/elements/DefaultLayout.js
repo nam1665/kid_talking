@@ -274,14 +274,6 @@ class Layout extends React.PureComponent {
     speech.onend = () => {
 
       this.startAssistant();
-      setTimeout(
-        function() {
-          this.startRecording();
-        }
-          .bind(this),
-        1000
-      );
-
 
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
@@ -308,18 +300,6 @@ class Layout extends React.PureComponent {
         this.send(this.state.next_test_quesion);
       }
 
-      if(this.state.text.includes("the lamp and the door")) {
-        this.setState({
-          artyomActive: false
-        });
-      }
-
-      if(this.state.text.includes("under the table")) {
-        this.setState({
-          artyomActive: false
-        });
-      }
-
     };
   }
 
@@ -334,7 +314,7 @@ class Layout extends React.PureComponent {
           this.startRecording();
         }
           .bind(this),
-        800
+        1000
       );
 
       if (this.state.status_change_question){
@@ -348,16 +328,12 @@ class Layout extends React.PureComponent {
         this.stopAssistant();
       }
 
-      if(this.state.text.includes("the lamp and the door")) {
-        this.setState({
-          artyomActive: false
-        });
+      if(this.state.text.includes("put the egg under the table")) {
+        this.stopAssistant();
       }
 
-      if(this.state.text.includes("under the table")) {
-        this.setState({
-          artyomActive: false
-        });
+      if(this.state.text.includes("into the window")) {
+        this.stopAssistant();
       }
 
     };
@@ -385,20 +361,30 @@ class Layout extends React.PureComponent {
           this.setState({
             speech_result_final: recognized
           });
-          this.stopRecording();
-          this.setState({
-            artyomActive: false
-          });
+          this.stopAssistant();
+          setTimeout(
+            function() {
+              this.stopRecording();
+            }
+              .bind(this),
+            1000
+          );
         }
         else {
           this.setState({
             speech_result_final: recognized,
             speech_status: 'Stop Listening'
           });
-          this.stopRecording();
-          this.setState({
-            artyomActive: false
-          });
+          this.stopAssistant();
+
+          setTimeout(
+            function() {
+              this.stopRecording();
+            }
+              .bind(this),
+            1000
+          );
+
           this.send(recognized);
           this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
             question_id: parseInt(this.current_question, 10) + 1,
@@ -645,7 +631,7 @@ class Layout extends React.PureComponent {
         <div className="col-md-7 text-center">
           <h2 className="text-white">{this.state.text}</h2>
           <p className="mb-2">
-            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 650 }} />
+            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 550 }} />
           </p>
         </div>
       );
