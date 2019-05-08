@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react'
+import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -85,7 +86,7 @@ class Layout extends React.PureComponent {
   object_img = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send(starter_triger);
+    this.send('pronun_trigger_4');
   }
 
   postData(url = '', data, type='json') {
@@ -242,6 +243,9 @@ class Layout extends React.PureComponent {
 
         if (data.components[component].content.fields.hasOwnProperty('show_score')){
           this.get_test_result(this.session_id);
+          this.setState({
+            show_result_table: true,
+          });
         }
 
       }
@@ -356,7 +360,8 @@ class Layout extends React.PureComponent {
       if(isFinal){
         if (this.state.status_pronunciation){
           this.setState({
-            speech_result_final: recognized
+            speech_result_final: recognized,
+            speech_status: 'Stop Listening'
           });
           this.stopAssistant();
           setTimeout(
@@ -452,7 +457,9 @@ class Layout extends React.PureComponent {
     var fd=new FormData();
     fd.append("text", input_text );
     fd.append("file",blob, filename);
-
+    this.setState({
+      checking_pronun: true
+    });
     var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
     this.postData(url_api, fd, 'FormData')
       .then(data => {
@@ -496,8 +503,10 @@ class Layout extends React.PureComponent {
 
         this.setState({
           text: text_new,
-          status_pronunciation: false
-        })
+          status_pronunciation: false,
+          checking_pronun: false
+        });
+
       })
       .catch(error => {
         let score = this.getRndInteger(50, 90);
@@ -572,7 +581,7 @@ class Layout extends React.PureComponent {
         if(student_point_final < 12 ){
           text_new = "Your score is " + student_point_final + "/22" + " . Your result is not good, but don't worry, let's practice more, it will be better";
         }
-        else if (student_point_final < 17) {
+        else if (student_point_final < 16) {
           text_new = "Your score is " + student_point_final + "/22" + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
 
         }
@@ -627,6 +636,9 @@ class Layout extends React.PureComponent {
       return (
         <div className="col-md-7 text-center">
           <h2 className="text-white">{this.state.text}</h2>
+          <div>
+            {this._result_table_render()}
+          </div>
           <p className="mb-2">
             <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 550 }} />
           </p>
@@ -653,6 +665,9 @@ class Layout extends React.PureComponent {
           {/*<div className="title">Speak Status: {this.state.speech_status}</div>*/}
           <button hidden={this.state.speech_status == "Stop Listening"}>
             <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
+          </button>
+          <button hidden={!this.state.checking_pronun}>
+            <img src={'https://www.voya.ie/Interface/Icons/LoadingBasketContents.gif'} alt="" style={{ width: 50 }} />
           </button>
         </div>
       </div>
@@ -840,12 +855,51 @@ class Layout extends React.PureComponent {
   }
 
 
+  _result_table_render() {
+    return (
+      <div hidden={!this.state.show_result_table}>
+        <MDBTable>
+          <MDBTableHead>
+            <tr>
+              <th>#</th>
+              <th>First</th>
+              <th>Last</th>
+              <th>Handle</th>
+            </tr>
+          </MDBTableHead>
+          <MDBTableBody>
+            <tr>
+              <td>1</td>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Larry</td>
+              <td>the Bird</td>
+              <td>@twitter</td>
+            </tr>
+          </MDBTableBody>
+        </MDBTable>
+      </div>
+    )
+  }
+
+
   render() {
 
     return (
       <div className="finishHomeWorkWrap py-5 d-flex justify-content-center align-items-center flex-column">
         <div className="fz-50 text-white font-weight-bold mb-4">Kidtopi Speaking Test</div>
         {this._dragrender()}
+
 
         <div className="typeTwentySeven w-100">
           <div className="container">
