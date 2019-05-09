@@ -45,61 +45,61 @@ class LoginLayout extends PureComponent {
 
     render() {
         return (
-            <Fragment>
-                <Helmet title="Login" />
-                <div className="login-register-wrap">
-                    <div className="login-register">
-                        <img alt="Demo" src="https://i.imgur.com/jZkJzig.png" />
+          <Fragment>
+              <Helmet title="Login" />
+              <div className="login-register-wrap">
+                  <div className="login-register">
+                      <img alt="Demo" src="https://i.imgur.com/jZkJzig.png" />
 
-                        <Form className="form" onSubmit={this._onSubmit.bind(this)}>
-                            <FormGroup>
-                                <Input
-                                    placeholder="Username..."
-                                    name="username"
-                                    bssize="lg"
-                                    innerRef={e => (this.usernameField = e)}
-                                    onChange={this._onChange.bind(this)}
-                                />
-                            </FormGroup>
-
-                            <FormGroup>
-                                <Input
-                                    placeholder="Secret code..."
-                                    type="password"
-                                    name="password"
-                                    bssize="lg"
-                                    innerRef={e => (this.passwordField = e)}
-                                    onChange={this._onChange.bind(this)}
-                                />
-                            </FormGroup>
-
-                            <label className="checkbox-label">
-                                Remember me
-                                <input
-                                    name="remember"
-                                    id="remember"
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    ref={e => (this.rememberField = e)}
-                                />
-                                <span className="checkmark" />
-                            </label>
-
-                            <Button
-                                type="submit"
-                                color="primary"
-                                block
+                      <Form className="form" onSubmit={this._onSubmit.bind(this)}>
+                          <FormGroup>
+                              <Input
+                                placeholder="Username..."
+                                name="username"
                                 bssize="lg"
-                                onClick={this._onSubmit.bind(this)}
-                                innerRef={e => (this.loginButton = e)}
-                                disabled
-                            >
-                                {`Let's Go`}
-                            </Button>
-                        </Form>
-                    </div>
-                </div>
-            </Fragment>
+                                innerRef={e => (this.usernameField = e)}
+                                onChange={this._onChange.bind(this)}
+                              />
+                          </FormGroup>
+
+                          <FormGroup>
+                              <Input
+                                placeholder="Secret code..."
+                                type="password"
+                                name="password"
+                                bssize="lg"
+                                innerRef={e => (this.passwordField = e)}
+                                onChange={this._onChange.bind(this)}
+                              />
+                          </FormGroup>
+
+                          <label className="checkbox-label">
+                              Remember me
+                              <input
+                                name="remember"
+                                id="remember"
+                                className="form-check-input"
+                                type="checkbox"
+                                ref={e => (this.rememberField = e)}
+                              />
+                              <span className="checkmark" />
+                          </label>
+
+                          <Button
+                            type="submit"
+                            color="primary"
+                            block
+                            bssize="lg"
+                            onClick={this._onSubmit.bind(this)}
+                            innerRef={e => (this.loginButton = e)}
+                            disabled
+                          >
+                              {`Let's Go`}
+                          </Button>
+                      </Form>
+                  </div>
+              </div>
+          </Fragment>
         );
     }
 }
@@ -119,6 +119,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(LoginLayout);

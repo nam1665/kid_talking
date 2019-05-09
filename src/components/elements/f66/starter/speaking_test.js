@@ -135,6 +135,7 @@ class Layout extends React.PureComponent {
       .catch(error => console.error(error));
   }
 
+
   handle(data){
     this.show = true;
     // hiển thị duy nhất 1 ảnh và respon ở 1 dòng
@@ -165,7 +166,7 @@ class Layout extends React.PureComponent {
           }else {
             this.test_answer = data.components[component].content.fields.test_answer.stringValue;
           }
-            if(this.student_point == "1"){
+          if(this.student_point == "1"){
             this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
               question_id: this.current_question,
               session_id: this.session_id,
@@ -308,6 +309,8 @@ class Layout extends React.PureComponent {
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
+      this.stopAssistant();
+
       if(this.state.drag_finish){
         this.setState({
           status_drag: false,
@@ -328,25 +331,34 @@ class Layout extends React.PureComponent {
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
-      this.startAssistant();
-
-      setTimeout(
-        function() {
-          this.startRecording();
-        }
-          .bind(this),
-        1000
-      );
-
-      if (this.state.status_change_question){
-        this.send(this.state.next_test_quesion);
-      }
-      this.setState({
-        status_change_question: false
-      });
-
-      if(this.state.status_drag) {
+      if(this.state.text.includes("balloon into the window")) {
         this.stopAssistant();
+      }
+
+      else if(this.state.text.includes("put the egg under the table")) {
+        this.stopAssistant();
+      }
+      else {
+        this.startAssistant();
+
+        setTimeout(
+          function() {
+            this.startRecording();
+          }
+            .bind(this),
+          1000
+        );
+
+        if (this.state.status_change_question){
+          this.send(this.state.next_test_quesion);
+        }
+        this.setState({
+          status_change_question: false
+        });
+
+        if(this.state.status_drag) {
+          this.stopAssistant();
+        }
       }
     };
   }
@@ -369,18 +381,18 @@ class Layout extends React.PureComponent {
 
     Jarvis.redirectRecognizedTextOutput((recognized,isFinal) => {
       if(isFinal){
+        this.stopAssistant();
         if (this.state.status_pronunciation){
           this.setState({
             speech_result_final: recognized,
             speech_status: 'Stop Listening'
           });
-          this.stopAssistant();
           setTimeout(
             function() {
               this.stopRecording();
             }
               .bind(this),
-            500
+            1000
           );
         }
         else {
@@ -388,13 +400,12 @@ class Layout extends React.PureComponent {
             speech_result_final: recognized,
             speech_status: 'Stop Listening'
           });
-          this.stopAssistant();
           setTimeout(
             function() {
               this.stopRecording();
             }
               .bind(this),
-            500
+            1000
           );
           this.send(recognized);
           this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
@@ -884,7 +895,7 @@ class Layout extends React.PureComponent {
 
   _result_table_right_render() {
     return (
-        <JsonTable className="table" rows = {this.state.right_list} />
+      <JsonTable className="table" rows = {this.state.right_list} />
     )
   }
 
