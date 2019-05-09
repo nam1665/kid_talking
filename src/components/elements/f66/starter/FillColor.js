@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import DefaultLayout from '../../DefaultLayout';
+import BaseLayer from './Base.js'
 
-class StarterFour extends React.Component {
+class StarterFour extends BaseLayer {
     state = {
         checked: false,
         active: null,
@@ -47,6 +48,10 @@ class StarterFour extends React.Component {
     };
 
     UNSAFE_componentWillMount() {
+        console.log(6);
+        // this.textToSpeech(this.props.q_text);
+        this.status_wait = true;
+        this.wait(300000);
         const {
             attachments: { sound },
             q_text
@@ -58,6 +63,96 @@ class StarterFour extends React.Component {
             this.setState({
                 totalSound: 5
             });
+        }
+    }
+
+    nextQuestion(){
+        this.setDefault();
+        const { o1, o2, o3, o4, o5, o6, listPen, totalSound } = this.state;
+        let correct = true;
+        let point = 5;
+        const answers = [];
+
+        // con chim trên chậu hoa
+        if (o2 == 2) {
+            //TODO
+            answers.push(`4:brown:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            if (o2 > 0) {
+                answers.push(`4:${listPen[o2 - 1].color}:false`);
+            } else {
+                answers.push(`4:no-color:false`);
+            }
+        }
+
+        // con chim sau cô bé
+        if (o3 == 3) {
+            answers.push(`3:red:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            if (o3 > 0) {
+                answers.push(`3:${listPen[o3 - 1].color}:false`);
+            } else {
+                answers.push(`3:no-color:false`);
+            }
+        }
+
+        // con chim đang bay
+        if (o4 == 1) {
+            answers.push(`5:green:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            if (o4 > 0) {
+                answers.push(`5:${listPen[o4 - 1].color}:false`);
+            } else {
+                answers.push(`5:no-color:false`);
+            }
+        }
+
+        // con chim trên đầu con chó
+        if (o5 == 4) {
+            answers.push(`2:pink:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            if (o5 > 0) {
+                answers.push(`2:${listPen[o5 - 1].color}:false`);
+            } else {
+                answers.push(`2:no-color:false`);
+            }
+        }
+
+        // con chim dưới cái cây
+        if (o6 == 5) {
+            answers.push(`1:yellow:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            if (o6 > 0) {
+                answers.push(`1:${listPen[o6 - 1].color}:false`);
+            } else {
+                answers.push(`1:no-color:false`);
+            }
+        }
+
+        const data = {
+            answer: answers,
+            correct: correct,
+            fraction: point
+        };
+
+        this.props.onNext(data);
+    }
+    check_color(){
+        const { o1, o2, o3, o4, o5, o6, listPen, totalSound } = this.state;
+        const dataAnswer = [o2, o3, o4, o5, o6];
+        console.log(dataAnswer.filter(o => o == null).length);
+        if (dataAnswer.filter(o => o == null).length == 1){
+            this.send(this.trigger_confirm);
         }
     }
 
@@ -108,83 +203,7 @@ class StarterFour extends React.Component {
                     });
                 }}
                 onNext={() => {
-                    let correct = true;
-                    let point = 5;
-                    const answers = [];
-
-                    // con chim trên chậu hoa
-                    if (o2 == 2) {
-                        //TODO
-                        answers.push(`4:brown:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        if (o2 > 0) {
-                            answers.push(`4:${listPen[o2 - 1].color}:false`);
-                        } else {
-                            answers.push(`4:no-color:false`);
-                        }
-                    }
-
-                    // con chim sau cô bé
-                    if (o3 == 3) {
-                        answers.push(`3:red:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        if (o3 > 0) {
-                            answers.push(`3:${listPen[o3 - 1].color}:false`);
-                        } else {
-                            answers.push(`3:no-color:false`);
-                        }
-                    }
-
-                    // con chim đang bay
-                    if (o4 == 1) {
-                        answers.push(`5:green:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        if (o4 > 0) {
-                            answers.push(`5:${listPen[o4 - 1].color}:false`);
-                        } else {
-                            answers.push(`5:no-color:false`);
-                        }
-                    }
-
-                    // con chim trên đầu con chó
-                    if (o5 == 4) {
-                        answers.push(`2:pink:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        if (o5 > 0) {
-                            answers.push(`2:${listPen[o5 - 1].color}:false`);
-                        } else {
-                            answers.push(`2:no-color:false`);
-                        }
-                    }
-
-                    // con chim dưới cái cây
-                    if (o6 == 5) {
-                        answers.push(`1:yellow:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        if (o6 > 0) {
-                            answers.push(`1:${listPen[o6 - 1].color}:false`);
-                        } else {
-                            answers.push(`1:no-color:false`);
-                        }
-                    }
-
-                    const data = {
-                        answer: answers,
-                        correct: correct,
-                        fraction: point
-                    };
-
-                    onNext(data);
+                    this.nextQuestion();
                 }}
             >
                 <div className="typeTwentySix w-100">
@@ -206,6 +225,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o1: this.state.currentId
                                     });
+                                    // moi lan click vao 1 con chim
+                                    // dataAnswer.filter(o => o != null).length < totalSound - 1
                                 }}
                             />
                             <div
@@ -224,6 +245,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o2: this.state.currentId
                                     });
+                                    // viet
+                                    this.check_color();
                                 }}
                             />
                             <div
@@ -243,6 +266,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o3: this.state.currentId
                                     });
+                                    // viet
+                                    this.check_color();
                                 }}
                             />
                             <div
@@ -261,6 +286,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o4: this.state.currentId
                                     });
+                                    this.check_color();
+                                    // viet
                                 }}
                             />
                             <div
@@ -280,6 +307,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o5: this.state.currentId
                                     });
+                                    // viet
+                                    this.check_color();
                                 }}
                             />
                             <div
@@ -298,6 +327,8 @@ class StarterFour extends React.Component {
                                     this.setState({
                                         o6: this.state.currentId
                                     });
+                                    // viet
+                                    this.check_color();
                                 }}
                             />
                             <img src={q_picture} alt="" className="noselect" draggable={false} />

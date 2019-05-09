@@ -1,740 +1,262 @@
-import React, { useState, useCallback } from 'react'
-
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import Route from 'src/helpers/Route';
 import { Progress } from 'reactstrap';
 import Alert from '../Alert';
-import uuid from "uuid";
-import { ReactMic } from 'react-mic';
-import Container from './Container'
-
-
-import Artyom from 'artyom.js';
-import ArtyomCommandsManager from 'src/helpers/ArtyomCommands';
-
-import ReactDOM from 'react-dom'
-import { DragDropContextProvider } from 'react-dnd'
-import HTML5Backend from 'react-dnd-html5-backend'
-
-const Jarvis = new Artyom();
-
-var starter_triger = 'start_trigger';
-
-var pronun_start = "pronun_trigger_1";
-
-
-var today = new Date();
-var dd = today.getDate();
-var mm = today.getMonth() + 1; //January is 0!
-
-var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-var yyyy = today.getFullYear();
-if (dd < 10) {
-  dd = '0' + dd;
-}
-if (mm < 10) {
-  mm = '0' + mm;
-}
-var today = dd + '/' + mm + '/' + yyyy;
-
-
-
 
 class Layout extends React.PureComponent {
+    constructor(props) {
+        super(props);
 
-  constructor (props, context){
-    super(props, context);
-    // Add `this` context to the handler functions
-    this.startAssistant = this.startAssistant.bind(this);
-    this.stopAssistant = this.stopAssistant.bind(this);
-    this.move_counterHanlder = this.move_counterHanlder.bind(this)
-    this.studen_move_answerHanlder = this.studen_move_answerHanlder.bind(this)
+        this.startTime = Date.now();
+        this.time = 0;
+    }
 
-    // Prepare simple state
-    this.state = {
-      artyomActive: false,
-      artyomIsReading: false,
-      move_count : 0
+    componentDidMount() {
+        if (this.props.q_audio) {
+            this.playAudio(this.props.q_audio);
+        }
+
+        this.interval = setInterval(() => {
+            this.time = Date.now() - this.startTime;
+        }, 1000);
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+        // if (nextProps.q_audio !== )
+        const { q_audio: oldAudio } = this.props;
+        const { q_audio: newAudio } = nextProps;
+
+        // console.log('oldAudio', oldAudio);
+        // console.log('newAudio', newAudio);
+
+        if (oldAudio !== newAudio) {
+            this.playAudio(newAudio);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.audio) {
+            this.audio.pause();
+        }
+
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+        }
+
+        if (this.timeout2) {
+            clearTimeout(this.timeout2);
+        }
+
+        if (this.interval) {
+            clearInterval(this.time);
+        }
+
+        if (this.soundBtn) this.soundBtn.classList.remove('d-none');
+
+        this.removeEvent();
+    }
+
+    playAudio = url => {
+        if (!url) return;
+
+        if (this.audio && this.audio.isPlaying) return;
+
+        this.removeEvent();
+
+        this.audio = new Audio(url);
+
+        this.addEvent();
+
+        if (typeof this.audio.play == 'function') this.audio.play();
+
+        this.audio.isPlaying = true;
     };
 
-  }
-  state = {
-    image: '',
-    text: '',
-    serverHistory: [],
-    checked: null,
-    showTest: false,
-    jarvis_say: '',
-    record: false,
-    status_pronunciation: false,
-    status_change_question: false,
-    open_mic_pronun: false,
-    speech_status: "Stop Listening",
-    status_drag: false,
-    on_dragging: false,
-  };
+    addEvent = () => {
+        if (!this.audio) return;
 
-  show = false;
-  session_id = uuid.v4();
-  score = "";
-  pronunciation_text = "";
-  next_test_quesion = "";
-  next_pronun_question = "";
-  student_total_point = 0;
-  current_question = "";
-  background_img = "";
-  object_img = "";
-  componentDidMount() {
-    this.send('question_20_trigger');
-  }
-
-  postData(url = '', data, type='json') {
-    if (type == 'json'){
-      return fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-          'Content-Type': 'application/json'
-          // "Content-Type": "application/x-www-form-urlencoded",
-        },
-        redirect: 'follow', // manual, *follow, error
-        referrer: 'no-referrer', // no-referrer, *client
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
-      }).then(response => response.json()); // parses JSON response into native Javascript objects
-    }
-    else {
-      return fetch(url, {
-        method: 'POST',
-        body: data
-      }).then(response => response.json());
-    }
-  }
-
-
-  send(q) {
-    this.stopAssistant();
-    this.setState({
-      status_pronunciation: false,
-      status_change_question: false
-    });
-    this.postData('https://ai.kidtopi.com/gateway/?format=true', {
-      q: q,
-      session_id: this.session_id,
-      lang: 'en'
-    })
-      .then(data => {
-        this.handle(data)
-      }) // JSON-string from `response.json()` call
-      .catch(error => console.error(error));
-  }
-
-  handle(data){
-    this.show = true;
-    // hiển thị duy nhất 1 ảnh và respon ở 1 dòng
-    let img = '';
-    let text_new = '';
-    for (let component in data.components){
-      if (data.components[component].name == 'IMAGE') {
-        if (this.state.image != data.components[component].content.imageUri){
-          img =  data.components[component].content.imageUri
-        }
-      }
-      if (data.components[component].name == 'DEFAULT') {
-        if (text_new.length == 0){
-          text_new = data.components[component].content
-        }
-        else {
-          text_new += " " + data.components[component].content
-        }
-      }
-      if (data.components[component].name == 'PAYLOAD') {
-
-        if (data.components[component].content.fields.hasOwnProperty('current_question')){
-          this.current_question = data.components[component].content.fields.current_question.stringValue;
-          this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
-          this.student_point = data.components[component].content.fields.student_point.stringValue;
-
-          if(this.student_point == "1"){
-            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-              question_id: this.current_question,
-              session_id: this.session_id,
-              answer: 'right',
-              point: 1,
-              test_level: 'starter',
-              date: today,
-              time: time
-            })
-              .then(data => {
-                console.log("post sucess")
-              }) // JSON-string from `response.json()` call
-              .catch(error => console.error(error));
-          }
-          if(this.student_point == "0.5") {
-            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-              question_id: this.current_question,
-              session_id: this.session_id,
-              answer: 'right',
-              point: 0.5,
-              test_level: 'starter',
-              date: today,
-              time: time
-            })
-              .then(data => {
-                console.log("post sucess")
-              }) // JSON-string from `response.json()` call
-              .catch(error => console.error(error));
-          }
-          if(this.student_point == "0") {
-            this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-              question_id: this.current_question,
-              session_id: this.session_id,
-              answer: 'wrong',
-              point: 0,
-              test_level: 'starter',
-              date: today,
-              time: time
-            })
-              .then(data => {
-                console.log("post sucess")
-              }) // JSON-string from `response.json()` call
-              .catch(error => console.error(error));
-          }
-
-          this.setState({
-            status_change_question: true,
-            next_test_quesion: this.next_test_quesion,
-            current_question: this.current_question,
-          })
-        }
-
-        if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
-          this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
-          this.next_pronun_question = data.components[component].content.fields.next_pronun_question.stringValue;
-          this.setState({
-            status_pronunciation: true,
-            next_pronun_question: this.next_pronun_question
-          })
-        }
-
-
-        if (data.components[component].content.fields.hasOwnProperty('drag_question')){
-          this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
-          this.background_img = data.components[component].content.fields.background_img.stringValue;
-          this.object_img = data.components[component].content.fields.object_img.stringValue;
-          this.left_larger = data.components[component].content.fields.left_larger.numberValue;
-          this.left_smaller = data.components[component].content.fields.left_smaller.numberValue;
-          this.top_larger = data.components[component].content.fields.top_larger.numberValue;
-          this.top_smaller = data.components[component].content.fields.top_smaller.numberValue;
-
-          this.setState({
-            status_drag: true,
-            on_dragging: true,
-            next_test_quesion: this.next_test_quesion,
-            background_img: this.background_img,
-            object_img: this.object_img,
-            hidepicture: true,
-            left_larger: this.left_larger,
-            left_smaller: this.left_smaller,
-            top_larger: this.top_larger,
-            top_smaller: this.top_smaller
-          });
-        }
-      }
-    }
-    if (img.length > 0){
-      this.setState({
-        image: img,
-        text: text_new
-      })
-    }
-    else {
-      this.setState({
-        text: text_new
-      })
-    }
-    if(this.state.status_pronunciation){
-      this.pronun_textToSpeech(text_new);
-      this.setState({
-        artyomActive: true
-      });
-    }
-    else{
-      this.textToSpeech(text_new)
-    }
-
-  }
-
-
-  pronun_textToSpeech(pronun_text) {
-    let speech = new SpeechSynthesisUtterance(pronun_text);
-    window.speechSynthesis.speak(speech);
-    speech.onend = () => {
-
-      this.startRecording();
-
-      if(this.state.text.includes("Native Speaker")) {
-        this.send(this.state.next_pronun_question);
-      }
-
-    };
-  }
-
-  textToSpeech(text) {
-    let speech = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(speech);
-    speech.onend = () => {
-
-      this.startAssistant();
-
-      if (this.state.status_change_question){
-        this.send(this.state.next_test_quesion);
-      }
-      this.setState({
-        status_change_question: false
-      });
-
-      if(this.state.status_drag){
-        this.stopAssistant();
-      }
-      if(this.state.drag_finish){
-        this.setState({
-          status_drag: false,
-          hidepicture: false,
-          drag_finish: false,
-          move_count: 0,
-          student_move: false,
-          end_drag: false
-        });
-        this.send(this.state.next_test_quesion);
-      }
-
-    };
-  }
-
-  startAssistant() {
-
-    let _this = this;
-
-    Jarvis.initialize({
-      debug: true,
-      continuous: true,
-      listen: true
-    }).then(() => {
-      _this.setState({
-        artyomActive: true
-      });
-    }).catch((err) => {
-      console.error("Oopsy daisy, this shouldn't happen !", err);
-    });
-
-    Jarvis.redirectRecognizedTextOutput((recognized,isFinal) => {
-      if(isFinal){
-        if (this.state.status_pronunciation){
-          this.setState({
-            speech_result_final: recognized
-          });
-          this.stopRecording();
-          this.setState({
-            artyomActive: false
-          });
-        }
-        else {
-          this.setState({
-            speech_result_final: recognized,
-            speech_status: 'Stop Listening'
-          });
-          this.send(recognized);
-          this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-            question_id: parseInt(this.current_question, 10) + 1,
-            session_id: this.session_id,
-            student_answer: recognized,
-            test_level: 'starter',
-            date: today,
-            time: time
-          })
-            .then(data => {
-              console.log("post sucess")
-            }) // JSON-string from `response.json()` call
-            .catch(error => console.error(error));
-        }
-      }else{
-        this.setState({
-          speech_result: recognized,
-          speech_status: 'Listening'
-        });
-      }
-    });
-
-    Jarvis.emptyCommands();
-
-    let CommandsManager = new ArtyomCommandsManager(Jarvis);
-    CommandsManager.loadCommands();
-
-  }
-
-  stopAssistant() {
-    let _this = this;
-
-    Jarvis.fatality().then(() => {
-      console.log("Jarvis has been succesfully stopped");
-
-      _this.setState({
-        artyomActive: false
-      });
-
-    }).catch((err) => {
-      console.error("Oopsy daisy, this shouldn't happen neither!", err);
-
-      _this.setState({
-        artyomActive: false,
-      });
-    });
-  }
-
-  startRecording = () => {
-    this.setState({
-      record: true
-    });
-  };
-
-  stopRecording = () => {
-    this.setState({
-      record: false
-    });
-  };
-
-  getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
-
-
-
-
-  checkPronunciation(blob, input_text) {
-    var filename = new Date().toISOString();
-    var fd=new FormData();
-    fd.append("text", input_text );
-    fd.append("file",blob, filename);
-
-    var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
-    this.postData(url_api, fd, 'FormData')
-      .then(data => {
-
-        let score = data.text_score.quality_score;
-
-        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-          question_id: this.current_question,
-          session_id: this.session_id,
-          pronun_word: this.pronunciation_text,
-          point: score,
-          test_level: 'pronunciation',
-          date: today,
-          time: time
-        })
-          .then(data => {
-            console.log("post sucess")
-          }) // JSON-string from `response.json()` call
-          .catch(error => console.error(error));
-
-        let text_new = "";
-        if (score >= 80){
-          text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
-          this.setState({
-            image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
-          });
-        }
-        else if(score < 80 && score > 60 ) {
-          this.setState({
-            image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
-          });
-          text_new = 'So close, you got ' + score + '% like Native Speaker.';
-        }
-        else  {
-          text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
-          this.setState({
-            image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
-          });
-        }
-
-        this.pronun_textToSpeech(text_new);
-
-        this.setState({
-          text: text_new,
-          status_pronunciation: false
-        })
-      })
-      .catch(error => {
-        let score = this.getRndInteger(50, 90);
-
-        this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-          question_id: this.current_question,
-          session_id: this.session_id,
-          pronun_word: this.pronunciation_text,
-          point: score,
-          test_level: 'pronunciation',
-          date: today,
-          time: time
-        })
-          .then(data => {
-            console.log("post sucess")
-          }) // JSON-string from `response.json()` call
-          .catch(error => console.error(error));
-
-        let text_new = "";
-        if (score >= 80){
-          text_new = 'Very good, your pronunciation is ' + score + '% like Native Speaker.';
-          this.setState({
-            image: 'https://www.stampsdirect.co.uk/media/product/41b/clixstamper-very-good-thumb-e40.png'
-          });
-        }
-        else if(score < 80 && score > 60 ) {
-          this.setState({
-            image:'https://thumbs.dreamstime.com/z/ch%C5%82opiec-pokazuje-kciuk-w-g%C3%B3r%C4%99-sukces-r%C4%99ki-znaka-gesta-45065761.jpg'
-          });
-          text_new = 'So close, you got ' + score + '% like Native Speaker.';
-        }
-        else  {
-          text_new = 'Oops, that doesn\'t sound good, you only pronounce ' + score + '% like Native Speaker.';
-          this.setState({
-            image:'http://cdn-ugc.mamaslatinas.com/gen/constrain/500/500/80/2013/08/21/15/2j/v4/po6ixb12g4.jpg'
-          });
-        }
-        this.pronun_textToSpeech(text_new);
-        this.setState({
-          text: text_new,
-          status_pronunciation: false
-        });
-        console.error(error);
-      });
-  }
-
-
-  onStop= (blobObject) => {
-    console.log('recordedBlob is: ', blobObject);
-    this.checkPronunciation(blobObject.blob, this.pronunciation_text);
-  };
-
-  next_question_click = () => {
-
-    if(this.state.status_pronunciation){
-      this.send(this.state.next_pronun_question);
-    }
-    else {
-      this.send(this.state.next_test_quesion);
-
-    }
-
-
-
-  };
-
-
-  renderQuestion() {
-    if (this.show) {
-      return (
-        <div className="col-md-7 text-center">
-          <h2 className="text-white">{this.state.text}</h2>
-          <p className="mb-2">
-            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 650 }} />
-          </p>
-        </div>
-      );
-    }
-  }
-
-
-
-
-  _renderSpeechtoText() {
-
-
-    const divStyle = {
-      zIndex: 999999
+        this.audio.addEventListener('ended', this.handleAudioEnd.bind(this));
     };
 
+    removeEvent = () => {
+        if (!this.audio) return;
 
-    return (
-
-      <div className="lesson_copy" style={divStyle}>
-        <div className="">
-          {/*<div className="title">Speak Status: {this.state.speech_status}</div>*/}
-          <button hidden={this.state.speech_status == "Stop Listening"}>
-            <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
-          </button>
-        </div>
-      </div>
-
-    );
-  }
-
-
-
-  _javisrender() {
-
-    const divStyle = {
-      zIndex: 999999
+        this.audio.removeEventListener('ended', this.handleAudioEnd.bind(this));
     };
 
+    handleAudioEnd() {
+        // this.instruction.classList.add('hidden');
+        const { onSoundEnded } = this.props;
 
-    return (
-      <div className="javis" style={divStyle}>
+        this.audio.isPlaying = false;
 
-        <button disabled={this.state.artyomActive} onClick={this.startAssistant}>
-          <img src={'https://img.icons8.com/ios/2x/block-microphone-filled.png'} alt="" style={{ width: 50 }} />
-        </button>
-        <button disabled={!this.state.artyomActive} onClick={this.stopAssistant}>
-          <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
-        </button>
-        {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
-        {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
-        <div className="hidden" style={divStyle} hidden>
-          <ReactMic
-            record={this.state.record}
-            onStop={this.onStop}
-            hidden='hidden'/>
-          <button onClick={this.startRecording} type="button">Start</button>
-          <button onClick={this.stopRecording} type="button">Stop</button>
-        </div>
-        <button onClick={this.next_question_click}>
-          <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
-        </button>
-      </div>
-    )
-  }
-
-
-  move_counterHanlder(dataFromChild) {
-    // log our state before and after we updated it
-    this.setState({
-      move_count: dataFromChild
-    });
-
-  }
-
-  studen_move_answerHanlder(location_data) {
-    // log our state before and after we updated it
-    this.setState({
-      student_move: location_data
-    });
-
-    this.stopAssistant();
-
-    if(this.state.move_count == 1) {
-      if(this.state.student_move){
-        let text_new = "Awesome, your answer is correct";
-        this.setState({
-          text: text_new,
-          on_dragging: false,
-          end_drag: true
-        });
-        this.textToSpeech(text_new);
-
-      }
-      else{
-        let text_new = "Oops, not correct, let try again";
-        this.setState({
-          text: text_new,
-          on_dragging: true
-        });
-        this.textToSpeech(text_new)
-      }
-    }
-    if(this.state.move_count == 2) {
-      if(this.state.student_move){
-        let text_new = "Awesome, now it is correct";
-        this.setState({
-          text: text_new,
-          on_dragging: false,
-          end_drag: true
-        });
-        this.textToSpeech(text_new);
-
-      }
-      else{
-        let text_new = "Oh no, not correct, you can try one more time";
-        this.setState({
-          text: text_new,
-          on_dragging: true
-        });
-        this.textToSpeech(text_new)
-      }
-    }
-    if(this.state.move_count == 3) {
-      if(this.state.student_move){
-        let text_new = "Well done, now it is correct";
-        this.setState({
-          text: text_new,
-          on_dragging: false,
-          end_drag: true
-        });
-        this.textToSpeech(text_new);
-
-      }
-      else{
-        let text_new = "Oops, still wrong, let try it next time";
-        this.setState({
-          text: text_new,
-          on_dragging: false,
-          end_drag: true
-        });
-        this.textToSpeech(text_new);
-
-      }
+        if (onSoundEnded) onSoundEnded();
     }
 
-    this.setState({
-      drag_finish: this.state.end_drag
-    });
+    handleAudioButton(e) {
+        e.preventDefault();
 
-    console.log(this.state.drag_finish)
+        // this.instruction.classList.remove('hidden');
 
-  }
+        const { handleAudioButton } = this.props;
 
+        if (handleAudioButton && typeof handleAudioButton == 'function') {
+            return handleAudioButton();
+        }
 
+        if (this.audio) {
+            this.audio.pause();
+            this.audio.currentTime = 0;
+            this.audio.play();
+        }
 
-  _dragrender() {
-    return (
-      <div hidden={!this.state.status_drag}>
-        <DragDropContextProvider backend={HTML5Backend}>
-          <Container
-            background_img = {this.state.background_img}
-            object_img={this.state.object_img}
-            left_larger={this.state.left_larger}
-            left_smaller={this.state.left_smaller}
-            top_larger={this.state.top_larger}
-            top_smaller={this.state.top_smaller}
-            action={this.move_counterHanlder}
-            action2={this.studen_move_answerHanlder}
+        this.timeout2 = setTimeout(() => {
+            this.soundBtn.classList.add('d-none');
+        }, 2000);
+    }
 
-          />
-        </DragDropContextProvider>
-      </div>
-    )
-  }
+    handleBackButton(e) {
+        e.preventDefault();
 
+        const confirm = window.confirm('Bạn có muốn thoát khỏi bài kiểm tra?');
 
-  render() {
+        if (confirm) this.props.history.push(Route.home);
+    }
 
-    return (
-      <div className="finishHomeWorkWrap py-5 d-flex justify-content-center align-items-center flex-column">
-        <div className="fz-50 text-white font-weight-bold mb-4">Kidtopi Speaking Test</div>
-        {this._dragrender()}
+    render() {
+        const {
+            current,
+            totalQuestions,
+            onNext,
+            children,
+            title,
+            instructorClass,
+            progressClass,
+            extendCom: Component,
+            background,
+            wrapperClasses,
+            alertMessage,
+            showModel
+        } = this.props;
+        const progress = (current / totalQuestions) * 100;
 
-        <div className="typeTwentySeven w-100">
-          <div className="container">
-            <div className="row justify-content-center">{this.renderQuestion()}</div>
-            {this._renderSpeechtoText()}
-            {this._javisrender()}
-          </div>
-        </div>
-      </div>
-    );
-  }
+        let style = {};
+
+        if (background) {
+            style = {
+                backgroundImage: `url(${background})`
+            };
+        }
+
+        return (
+            <div className={`homework-wrap justify-content-between flex-column ${wrapperClasses}`}>
+                {Component ? <Component /> : null}
+                {/* Start Header */}
+                <div className="siteHeader d-flex justify-content-end">
+                    {/* Tạm thời sẽ ẩn nút back */}
+                    {/* <a className="btnBack" href="#" onClick={this.handleBackButton.bind(this)}>
+                        <img src="/images/homework/back.png" alt="" />
+                    </a> */}
+
+                    <div className={`instruction ${instructorClass}`} ref={e => (this.instruction = e)}>
+                        <div className="inner d-flex align-items-center">
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: title
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {this.props.q_audio && (
+                        <a
+                            className="btnInstruction"
+                            href="#"
+                            onClick={this.handleAudioButton.bind(this)}
+                            ref={e => (this.soundBtn = e)}
+                        >
+                            <img src="/images/homework/voiceBlue.png" alt="" />
+                        </a>
+                    )}
+                </div>
+                {/* End Header */}
+
+                {/* Start Content */}
+                <div className="d-flex w-100 h-100 justify-content-center align-items-center">{children}</div>
+                {/* Start Content */}
+
+                {/* Start Footer */}
+                <div className="siteFooter fixed-bottom">
+                    <div className={`progressWrap ${progressClass}`}>
+                        <div className="number">
+                            {current}/{totalQuestions}
+                        </div>
+                        <Progress value={progress} />
+                    </div>
+                    <div className={`btnNextWrap pl-4 d-flex justify-content-center align-items-center`}>
+                        <span className="text mr-3 mt-2">Next</span>
+                        <button
+                            className="btn-3d btn-rounded-circle btn-pink"
+                            onClick={() => {
+                                if (showModel) this.alertForm.toggle();
+                                else if (onNext) onNext(this.time);
+                            }}
+                        >
+                            <svg style={{ height: '45px' }} viewBox="0 0 256 512">
+                                <path
+                                    fill="currentColor"
+                                    d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {/* End Footer */}
+                <Alert
+                    ref={e => (this.alertForm = e)}
+                    message={alertMessage ? alertMessage : 'Bạn chắc chắn muốn chuyển tới câu sau?'}
+                    onOk={() => {
+                        if (onNext) onNext(this.time);
+                    }}
+                />
+                {background ? (
+                    <img
+                        src={background}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100vh'
+                        }}
+                    />
+                ) : null}
+            </div>
+        );
+    }
 }
 
+Layout.propTypes = {
+    onNext: PropTypes.func,
+    data: PropTypes.array,
+    q_audio: PropTypes.any,
+    current: PropTypes.number,
+    totalQuestions: PropTypes.number,
+    history: PropTypes.any,
+    children: PropTypes.any,
+    showNextButton: PropTypes.bool,
+    title: PropTypes.string,
+    instructorClass: PropTypes.string,
+    progressClass: PropTypes.string,
+    extendCom: PropTypes.any,
+    background: PropTypes.string,
+    wrapperClasses: PropTypes.string,
+    alertMessage: PropTypes.string,
+    showModel: PropTypes.bool
+};
 
 export default withRouter(Layout);

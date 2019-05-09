@@ -2,16 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import DefaultLayout from '../../DefaultLayout';
+import BaseLayer from './Base.js'
 
-class StarterTwo extends React.Component {
+class StarterTwo extends BaseLayer {
     state = {
         value: ''
     };
-
+    status_t2s = false;
     componentDidMount() {
         if (this.inputText) {
             this.inputText.focus();
         }
+        console.log(4);
+
+        // this.textToSpeech(this.props.q_text);
+        // console.log(this.props.q_text);
+        this.status_wait = true;
+        this.wait(60000);
     }
 
     renderQuestion() {
@@ -108,6 +115,14 @@ class StarterTwo extends React.Component {
                             this.setState({
                                 value: e.target.value
                             });
+                            // viet vao day
+                            this.status_t2s = true;
+                            setTimeout(() => {
+                                if (this.status_t2s){
+                                    this.send(this.trigger_confirm);
+                                }
+                                this.status_t2s = false;                   
+                            }, 500)
                         }}
                         ref={e => (this.inputText = e)}
                     />
@@ -115,6 +130,33 @@ class StarterTwo extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    nextQuestion(){
+        this.setDefault();
+
+        let res = {};
+
+        if (this.props.isExample) {
+            res = {
+                answer: ['example'],
+                correct: false,
+                fraction: 0
+            };
+        } else {
+            const correct =
+                _.findIndex(this.props.data, o => {
+                    return o.text.toLowerCase() == this.state.value.toLowerCase();
+                }) > -1;
+
+            res = {
+                answer: [this.state.value],
+                correct: correct,
+                fraction: correct ? 1 : 0
+            };
+        }
+
+        this.props.onNext(res);
     }
 
     render() {
@@ -125,28 +167,7 @@ class StarterTwo extends React.Component {
                 {...other}
                 title={`${isExample ? 'Example: ' : ''}${q_title.replace(/\[\[.*?\]\]/g, '').trim()}`}
                 onNext={() => {
-                    let res = {};
-
-                    if (isExample) {
-                        res = {
-                            answer: ['example'],
-                            correct: false,
-                            fraction: 0
-                        };
-                    } else {
-                        const correct =
-                            _.findIndex(data, o => {
-                                return o.text.toLowerCase() == this.state.value.toLowerCase();
-                            }) > -1;
-
-                        res = {
-                            answer: [this.state.value],
-                            correct: correct,
-                            fraction: correct ? 1 : 0
-                        };
-                    }
-
-                    onNext(res);
+                    this.nextQuestion();
                 }}
             >
                 <div className="typeSixteen w-100">
@@ -154,6 +175,7 @@ class StarterTwo extends React.Component {
                         <div className="row justify-content-center">
                             <div className="col-md-7">
                                 <div className="text-center">
+                                {this._javisrender()} 
                                     <img
                                         src={
                                             attachments.picture && attachments.picture[0]

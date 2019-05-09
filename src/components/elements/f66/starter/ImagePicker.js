@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import DefaultLayout from '../../DefaultLayout';
+import BaseLayer from './Base.js'
 
-class StarterThree extends React.Component {
+class StarterThree extends BaseLayer {
     state = {
         checked: null,
         listExample: {
@@ -18,6 +19,10 @@ class StarterThree extends React.Component {
     };
 
     renderQuestion() {
+        console.log(5);
+        // this.textToSpeech(this.props.q_text);
+        this.status_wait = true;
+        this.wait(60000);
         if (this.props.isExample) {
             return (
                 <div className="col-md-8">
@@ -57,6 +62,8 @@ class StarterThree extends React.Component {
                                         this.setState({
                                             checked: index
                                         });
+                                        // viet vao day
+                                        this.send(this.trigger_confirm);
                                     }}
                                 >
                                     <div className={`img-wrap  ${index === this.state.checked ? 'checked' : null}`}>
@@ -70,7 +77,37 @@ class StarterThree extends React.Component {
             </div>
         );
     }
+    nextQuestion(){
+        this.setDefault();
+        let res = {};
 
+        const ansData = _.clone(this.props.data).sort((a, b) => {
+            return a.pos - b.pos;
+        });
+        if (this.props.isExample) {
+            res = {
+                answer: ['example'],
+                correct: false,
+                fraction: 0
+            };
+        } else {
+            if (this.state.checked != null) {
+                res = {
+                    answer: [this.state.checked],
+                    correct: Number(ansData[this.state.checked].fraction) == 1,
+                    fraction: Number(ansData[this.state.checked].fraction)
+                };
+            } else {
+                res = {
+                    answer: [''],
+                    correct: false,
+                    fraction: 0
+                };
+            }
+        }
+
+        this.props.onNext(res);
+    }
     render() {
         const { onNext, isExample, q_text, data, q_title, ...other } = this.props;
 
@@ -79,35 +116,7 @@ class StarterThree extends React.Component {
                 {...other}
                 title={`${isExample ? 'Example: ' : ''}${q_title.replace(/\[\[.*?\]\]/g, '').trim()}`}
                 onNext={() => {
-                    let res = {};
-
-                    const ansData = _.clone(data).sort((a, b) => {
-                        return a.pos - b.pos;
-                    });
-
-                    if (isExample) {
-                        res = {
-                            answer: ['example'],
-                            correct: false,
-                            fraction: 0
-                        };
-                    } else {
-                        if (this.state.checked != null) {
-                            res = {
-                                answer: [this.state.checked],
-                                correct: Number(ansData[this.state.checked].fraction) == 1,
-                                fraction: Number(ansData[this.state.checked].fraction)
-                            };
-                        } else {
-                            res = {
-                                answer: [''],
-                                correct: false,
-                                fraction: 0
-                            };
-                        }
-                    }
-
-                    onNext(res);
+                    this.nextQuestion();
                 }}
             >
                 <div className="typeEighteen w-100">
@@ -115,6 +124,7 @@ class StarterThree extends React.Component {
                         <div className="row justify-content-center">{this.renderQuestion()}</div>
                     </div>
                 </div>
+                {this._javisrender()} 
             </DefaultLayout>
         );
     }

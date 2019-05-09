@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DefaultLayout from '../../DefaultLayout';
-
-class StarterEight extends React.Component {
+import BaseLayer from './Base.js'
+class StarterEight extends BaseLayer {
     state = {
         checked: false,
         listAnswer: [
@@ -47,18 +47,88 @@ class StarterEight extends React.Component {
         a5: ''
     };
 
+    nextQuestion(){
+        this.setDefault();
+        
+        const { a1, a2, a3, a4, a5 } = this.state;
+
+        let correct = true;
+        let point = 5;
+
+        const answers = [];
+
+        if (a1 && a1.toLowerCase() == 'hats') {
+            answers.push(`${a1.toLowerCase()}:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            answers.push(`${a1.toLowerCase()}:false`);
+        }
+
+        if (a2 && a2.toLowerCase() == 'books') {
+            answers.push(`${a2.toLowerCase()}:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            answers.push(`${a2.toLowerCase()}:false`);
+        }
+
+        if (a3 && a3.toLowerCase() == 'sand') {
+            answers.push(`${a3.toLowerCase()}:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            answers.push(`${a3.toLowerCase()}:false`);
+        }
+
+        if (a4 && a4.toLowerCase() == 'football') {
+            answers.push(`${a4.toLowerCase()}:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            answers.push(`${a4.toLowerCase()}:false`);
+        }
+
+        if (a5 && a5.toLowerCase() == 'fish') {
+            answers.push(`${a5.toLowerCase()}:true`);
+        } else {
+            correct = false;
+            point = point - 1;
+            answers.push(`${a5.toLowerCase()}:false`);
+        }
+
+        const data = {
+            answer: answers,
+            correct: correct,
+            fraction: Number(point)
+        };
+
+        this.props.onNext(data);
+    }
+
     componentDidMount() {
+        console.log(2);
         if (this.inputText) {
             this.inputText.focus();
         }
+        // this.textToSpeech(this.props.q_text);
+        this.status_wait = true;
+        this.wait(30000);
     }
 
     _answer() {
         const { a1, a2, a3, a4, a5 } = this.state;
-        if (a1 != null && a2 != null && a3 != null && a4 != null && a5 != null) {
+        if (a1 != "" && a2 != "" && a3 != "" && a4 != "" && a5 != "") {
+            this.status_t2s = true;
+            setTimeout(() => {
+                if (this.status_t2s){
+                    this.send(this.trigger_confirm);
+                }
+                this.status_t2s = false;                   
+            }, 500);
             return this.setState({
                 checked: true
-            });
+            });            
         }
         return this.setState({
             checked: false
@@ -73,60 +143,7 @@ class StarterEight extends React.Component {
                 wrapperClasses="resize-it-please"
                 title={'Read this. Choose a word from the box. Write the correct word next to numbers 1-5'}
                 onNext={() => {
-                    const { a1, a2, a3, a4, a5 } = this.state;
-
-                    let correct = true;
-                    let point = 5;
-
-                    const answers = [];
-
-                    if (a1 && a1.toLowerCase() == 'hats') {
-                        answers.push(`${a1.toLowerCase()}:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        answers.push(`${a1.toLowerCase()}:false`);
-                    }
-
-                    if (a2 && a2.toLowerCase() == 'books') {
-                        answers.push(`${a2.toLowerCase()}:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        answers.push(`${a2.toLowerCase()}:false`);
-                    }
-
-                    if (a3 && a3.toLowerCase() == 'sand') {
-                        answers.push(`${a3.toLowerCase()}:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        answers.push(`${a3.toLowerCase()}:false`);
-                    }
-
-                    if (a4 && a4.toLowerCase() == 'football') {
-                        answers.push(`${a4.toLowerCase()}:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        answers.push(`${a4.toLowerCase()}:false`);
-                    }
-
-                    if (a5 && a5.toLowerCase() == 'fish') {
-                        answers.push(`${a5.toLowerCase()}:true`);
-                    } else {
-                        correct = false;
-                        point = point - 1;
-                        answers.push(`${a5.toLowerCase()}:false`);
-                    }
-
-                    const data = {
-                        answer: answers,
-                        correct: correct,
-                        fraction: Number(point)
-                    };
-
-                    onNext(data);
+                    this.nextQuestion();
                 }}
                 showNextButton={this.state.checked}
             >
@@ -135,6 +152,7 @@ class StarterEight extends React.Component {
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-8">
                                 <div className="text-center">
+                                {this._javisrender()}
                                     <img
                                         src="/images/homework/test-8/starter/1.png"
                                         className="h-auto"
