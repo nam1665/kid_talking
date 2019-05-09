@@ -17,6 +17,7 @@ import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
 const Jarvis = new Artyom();
+const JsonTable = require('ts-react-json-table');
 
 var starter_triger = 'start_trigger';
 
@@ -37,6 +38,7 @@ if (mm < 10) {
 }
 var today = dd + '/' + mm + '/' + yyyy;
 
+var items = [];
 
 
 
@@ -56,7 +58,8 @@ class Layout extends React.PureComponent {
     this.state = {
       artyomActive: false,
       artyomIsReading: false,
-      move_count : 0
+      move_count : 0,
+      myObject: {}
     };
 
   }
@@ -87,7 +90,7 @@ class Layout extends React.PureComponent {
   test_answer = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send("question_23_trigger");
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
@@ -585,6 +588,13 @@ class Layout extends React.PureComponent {
     this.postData(url_api, fd, 'FormData')
       .then(data => {
         let student_point_final = data.sum;
+        this.setState({
+          right_list: data.right,
+          wrong_list: data.wrong,
+          pronunce_list: data.pronunce
+        });
+        // let student_wrong_list = data.wrong;
+        // let student_pronunce = data.pronunce;
         let text_new = "";
         if(student_point_final < 12 ){
           text_new = "Your score is " + student_point_final + "/22" + " . Your result is not good, but don't worry, let's practice more, it will be better";
@@ -596,14 +606,18 @@ class Layout extends React.PureComponent {
         else {
           text_new = "Your score is " + student_point_final + "/22" +  " . Excellent job, I'm proud of you, your mother proud of you, your bros proud of you, everyone proud of you";
         }
+
         this.textToSpeech(text_new);
         this.setState({
-          text: text_new
+          text: text_new,
+          // student_wrong_list: student_wrong_list,
+          // student_pronunce: student_pronunce
         });
       })
       .catch(error => {
         console.error(error);
       });
+
   }
 
 
@@ -644,8 +658,13 @@ class Layout extends React.PureComponent {
       return (
         <div className="col-md-7 text-center">
           <h2 className="text-white">{this.state.text}</h2>
-          <div>
-            {this._result_table_render()}
+          <div hidden={!this.state.show_result_table}>
+            <text style={{fontSize: 20, color: 'white'}}>Wrong Answers</text>
+            {this._result_table_wrong_render()}
+            <text style={{fontSize: 20, color: 'white'}}>Pronunciation</text>
+            {this._result_table_pronunce_render()}
+            {/*<text style={{fontSize: 20, color: 'white'}}>Right Answers</text>*/}
+            {/*{this._result_table_right_render()}*/}
           </div>
           <p className="mb-2">
             <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 550 }} />
@@ -670,7 +689,6 @@ class Layout extends React.PureComponent {
 
       <div className="lesson_copy" style={divStyle}>
         <div className="">
-          {/*<div className="title">Speak Status: {this.state.speech_status}</div>*/}
           <button hidden={this.state.speech_status == "Stop Listening"}>
             <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
           </button>
@@ -863,42 +881,25 @@ class Layout extends React.PureComponent {
   }
 
 
-  _result_table_render() {
+
+  _result_table_right_render() {
     return (
-      <div hidden={!this.state.show_result_table}>
-        <MDBTable>
-          <MDBTableHead>
-            <tr>
-              <th>#</th>
-              <th>First</th>
-              <th>Last</th>
-              <th>Handle</th>
-            </tr>
-          </MDBTableHead>
-          <MDBTableBody>
-            <tr>
-              <td>1</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </MDBTableBody>
-        </MDBTable>
-      </div>
+        <JsonTable className="table" rows = {this.state.right_list} />
     )
   }
+
+  _result_table_wrong_render() {
+    return (
+      <JsonTable className="table" rows = {this.state.wrong_list} />
+    )
+  }
+
+  _result_table_pronunce_render() {
+    return (
+      <JsonTable className="table" rows = {this.state.pronunce_list} />
+    )
+  }
+
 
 
   render() {
