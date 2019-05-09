@@ -156,6 +156,7 @@ class Layout extends React.PureComponent {
           this.current_question = data.components[component].content.fields.current_question.stringValue;
           this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
           this.student_point = data.components[component].content.fields.student_point.stringValue;
+          this.test_answer = data.components[component].content.fields.test_answer.stringValue;
 
           if(this.student_point == "1"){
             this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
@@ -163,6 +164,7 @@ class Layout extends React.PureComponent {
               session_id: this.session_id,
               answer: 'right',
               point: 1,
+              test_answer: this.test_answer,
               test_level: 'starter',
               date: today,
               time: time
@@ -177,6 +179,7 @@ class Layout extends React.PureComponent {
               session_id: this.session_id,
               answer: 'right',
               point: 0.5,
+              test_answer: this.test_answer,
               test_level: 'starter',
               date: today,
               time: time
@@ -191,6 +194,7 @@ class Layout extends React.PureComponent {
               session_id: this.session_id,
               answer: 'wrong',
               point: 0,
+              test_answer: this.test_answer,
               test_level: 'starter',
               date: today,
               time: time

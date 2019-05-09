@@ -124,13 +124,13 @@ class BaseLayer extends React.Component {
     }
 
     textToSpeech(text) {
+        if (text.includes('reading and writing section')){
+            this.send(this.trigger_ready);
+        }
         this.stopAssistant();
         let speech = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(speech);
         speech.onend = () => {
-            if (text.includes('reading and writing section')){
-                this.send(this.trigger_ready);
-            }
             if (this.status_listening){
                 this.status_wait = false;
                 this.startAssistant();                
