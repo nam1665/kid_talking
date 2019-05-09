@@ -90,7 +90,7 @@ class Layout extends React.PureComponent {
   test_answer = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send(starter_triger);
+    this.send('end_of_class');
   }
 
   postData(url = '', data, type='json') {
@@ -843,7 +843,7 @@ class Layout extends React.PureComponent {
         test_level: 'starter',
         date: today,
         time: time,
-        student_answer: 'drag n drop question'
+        test_answer: 'drag n drop question',
       })
         .then(data => {
         }) // JSON-string from `response.json()` call
