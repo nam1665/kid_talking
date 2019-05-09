@@ -15,6 +15,8 @@ class StarterTwo extends BaseLayer {
         }
         console.log(4);
 
+        // this.textToSpeech(this.props.q_text);
+        // console.log(this.props.q_text);
         this.status_wait = true;
         this.wait(60000);
     }

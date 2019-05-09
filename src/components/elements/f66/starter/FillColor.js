@@ -49,6 +49,7 @@ class StarterFour extends BaseLayer {
 
     UNSAFE_componentWillMount() {
         console.log(6);
+        // this.textToSpeech(this.props.q_text);
         this.status_wait = true;
         this.wait(300000);
         const {

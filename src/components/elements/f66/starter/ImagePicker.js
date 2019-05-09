@@ -20,6 +20,7 @@ class StarterThree extends BaseLayer {
 
     renderQuestion() {
         console.log(5);
+        // this.textToSpeech(this.props.q_text);
         this.status_wait = true;
         this.wait(60000);
         if (this.props.isExample) {

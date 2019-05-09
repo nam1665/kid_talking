@@ -56,6 +56,8 @@ class StarterFive extends BaseLayer {
                 }
             }, 1000);
         }
+        // this.textToSpeech(this.props.q_text);
+        // console.log(this.props.q_text)
         this.status_wait = true;
         this.wait();
 
