@@ -84,9 +84,10 @@ class Layout extends React.PureComponent {
   current_question = "";
   background_img = "";
   object_img = "";
+  test_answer = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send(starter_triger);
+    this.send("question_23_trigger");
   }
 
   postData(url = '', data, type='json') {
@@ -156,9 +157,12 @@ class Layout extends React.PureComponent {
           this.current_question = data.components[component].content.fields.current_question.stringValue;
           this.next_test_quesion = data.components[component].content.fields.next_test_quesion.stringValue;
           this.student_point = data.components[component].content.fields.student_point.stringValue;
-          this.test_answer = data.components[component].content.fields.test_answer.stringValue;
-
-          if(this.student_point == "1"){
+          if(data.components[component].content.fields.test_answer.stringValue == undefined){
+            this.test_answer = "";
+          }else {
+            this.test_answer = data.components[component].content.fields.test_answer.stringValue;
+          }
+            if(this.student_point == "1"){
             this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
               question_id: this.current_question,
               session_id: this.session_id,
