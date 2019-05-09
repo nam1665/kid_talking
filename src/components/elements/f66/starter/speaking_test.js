@@ -90,7 +90,7 @@ class Layout extends React.PureComponent {
   test_answer = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send('end_of_class');
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
