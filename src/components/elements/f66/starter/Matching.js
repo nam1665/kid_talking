@@ -128,6 +128,7 @@ class StarterOne extends BaseLayer {
         }, 100);
         console.log(3);
 
+        // this.textToSpeech(this.props.q_text);
         this.status_wait = true;
         this.wait(300000);
     }

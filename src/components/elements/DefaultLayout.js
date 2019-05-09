@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react'
-import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-
+import Route from 'src/helpers/Route';
+import { Progress } from 'reactstrap';
+import Alert from '../Alert';
 import uuid from "uuid";
 import { ReactMic } from 'react-mic';
 import Container from './Container'
@@ -49,8 +50,6 @@ class Layout extends React.PureComponent {
     this.stopAssistant = this.stopAssistant.bind(this);
     this.move_counterHanlder = this.move_counterHanlder.bind(this)
     this.studen_move_answerHanlder = this.studen_move_answerHanlder.bind(this)
-    this.studen_reset_move = this.studen_reset_move.bind(this)
-
 
     // Prepare simple state
     this.state = {
@@ -78,15 +77,16 @@ class Layout extends React.PureComponent {
 
   show = false;
   session_id = uuid.v4();
+  score = "";
   pronunciation_text = "";
   next_test_quesion = "";
   next_pronun_question = "";
-  current_question = 0;
+  student_total_point = 0;
+  current_question = "";
   background_img = "";
   object_img = "";
   componentDidMount() {
-    this.stopAssistant();
-    this.send("end_of_class");
+    this.send('question_20_trigger');
   }
 
   postData(url = '', data, type='json') {
@@ -168,6 +168,7 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
+                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -182,6 +183,7 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
+                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -196,6 +198,7 @@ class Layout extends React.PureComponent {
               time: time
             })
               .then(data => {
+                console.log("post sucess")
               }) // JSON-string from `response.json()` call
               .catch(error => console.error(error));
           }
@@ -208,7 +211,6 @@ class Layout extends React.PureComponent {
         }
 
         if (data.components[component].content.fields.hasOwnProperty('pronunciation_text')){
-          this.stopAssistant();
           this.pronunciation_text = data.components[component].content.fields.pronunciation_text.stringValue;
           this.next_pronun_question = data.components[component].content.fields.next_pronun_question.stringValue;
           this.setState({
@@ -240,14 +242,6 @@ class Layout extends React.PureComponent {
             top_smaller: this.top_smaller
           });
         }
-
-        if (data.components[component].content.fields.hasOwnProperty('show_score')){
-          this.get_test_result(this.session_id);
-          this.setState({
-            show_result_table: true,
-          });
-        }
-
       }
     }
     if (img.length > 0){
@@ -263,6 +257,9 @@ class Layout extends React.PureComponent {
     }
     if(this.state.status_pronunciation){
       this.pronun_textToSpeech(text_new);
+      this.setState({
+        artyomActive: true
+      });
     }
     else{
       this.textToSpeech(text_new)
@@ -276,37 +273,10 @@ class Layout extends React.PureComponent {
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
-      this.startAssistant();
-      setTimeout(
-        function() {
-          this.startRecording();
-        }
-          .bind(this),
-        2000
-      );
+      this.startRecording();
+
       if(this.state.text.includes("Native Speaker")) {
         this.send(this.state.next_pronun_question);
-      }
-
-    };
-  }
-
-
-  drag_textToSpeech(drag_text) {
-    let speech = new SpeechSynthesisUtterance(drag_text);
-    window.speechSynthesis.speak(speech);
-    speech.onend = () => {
-
-      if(this.state.drag_finish){
-        this.setState({
-          status_drag: false,
-          hidepicture: false,
-          drag_finish: false,
-          move_count: 0,
-          student_move: false,
-          end_drag: false
-        });
-        this.send(this.state.next_test_quesion);
       }
 
     };
@@ -319,14 +289,6 @@ class Layout extends React.PureComponent {
 
       this.startAssistant();
 
-      setTimeout(
-        function() {
-          this.startRecording();
-        }
-          .bind(this),
-        1000
-      );
-
       if (this.state.status_change_question){
         this.send(this.state.next_test_quesion);
       }
@@ -334,9 +296,21 @@ class Layout extends React.PureComponent {
         status_change_question: false
       });
 
-      if(this.state.status_drag) {
+      if(this.state.status_drag){
         this.stopAssistant();
       }
+      if(this.state.drag_finish){
+        this.setState({
+          status_drag: false,
+          hidepicture: false,
+          drag_finish: false,
+          move_count: 0,
+          student_move: false,
+          end_drag: false
+        });
+        this.send(this.state.next_test_quesion);
+      }
+
     };
   }
 
@@ -360,31 +334,18 @@ class Layout extends React.PureComponent {
       if(isFinal){
         if (this.state.status_pronunciation){
           this.setState({
-            speech_result_final: recognized,
-            speech_status: 'Stop Listening'
+            speech_result_final: recognized
           });
-          this.stopAssistant();
-          setTimeout(
-            function() {
-              this.stopRecording();
-            }
-              .bind(this),
-            500
-          );
+          this.stopRecording();
+          this.setState({
+            artyomActive: false
+          });
         }
         else {
           this.setState({
             speech_result_final: recognized,
             speech_status: 'Stop Listening'
           });
-          this.stopAssistant();
-          setTimeout(
-            function() {
-              this.stopRecording();
-            }
-              .bind(this),
-            500
-          );
           this.send(recognized);
           this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
             question_id: parseInt(this.current_question, 10) + 1,
@@ -395,6 +356,7 @@ class Layout extends React.PureComponent {
             time: time
           })
             .then(data => {
+              console.log("post sucess")
             }) // JSON-string from `response.json()` call
             .catch(error => console.error(error));
         }
@@ -457,9 +419,7 @@ class Layout extends React.PureComponent {
     var fd=new FormData();
     fd.append("text", input_text );
     fd.append("file",blob, filename);
-    this.setState({
-      checking_pronun: true
-    });
+
     var url_api = "https://ai.kidtopi.com/api/v1/pronunciation/";
     this.postData(url_api, fd, 'FormData')
       .then(data => {
@@ -476,6 +436,7 @@ class Layout extends React.PureComponent {
           time: time
         })
           .then(data => {
+            console.log("post sucess")
           }) // JSON-string from `response.json()` call
           .catch(error => console.error(error));
 
@@ -503,10 +464,8 @@ class Layout extends React.PureComponent {
 
         this.setState({
           text: text_new,
-          status_pronunciation: false,
-          checking_pronun: false
-        });
-
+          status_pronunciation: false
+        })
       })
       .catch(error => {
         let score = this.getRndInteger(50, 90);
@@ -521,6 +480,7 @@ class Layout extends React.PureComponent {
           time: time
         })
           .then(data => {
+            console.log("post sucess")
           }) // JSON-string from `response.json()` call
           .catch(error => console.error(error));
 
@@ -552,69 +512,10 @@ class Layout extends React.PureComponent {
       });
   }
 
-  upload_recordfile(blob, session_id, question_id) {
-    var filename = new Date().toISOString();
-    var fd=new FormData();
-    fd.append("file",blob, filename);
-    fd.append("session_id", session_id );
-    fd.append("info", question_id);
-
-
-    var url_api = "https://ai.kidtopi.com/api/v1/storage_file/";
-    this.postData(url_api, fd, 'FormData')
-      .then(data => {
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
-  get_test_result(session_id) {
-    var fd=new FormData();
-    fd.append("session_id", 'f174c638-8d1f-4eec-9de2-8785d9035eda' );
-
-    var url_api = "https://ai.kidtopi.com/get_result_speaking_test/";
-    this.postData(url_api, fd, 'FormData')
-      .then(data => {
-        let student_point_final = data.sum;
-        let right_test_result = data.right;
-        let wrong_test_result = data.wrong;
-        let pronunce_test_result = data.pronunce;
-
-        let text_new = "";
-        if(student_point_final < 12 ){
-          text_new = "Your score is " + student_point_final + "/22" + " . Your result is not good, but don't worry, let's practice more, it will be better";
-        }
-        else if (student_point_final < 16) {
-          text_new = "Your score is " + student_point_final + "/22" + " . You did a good job today, but don't remember to practice more, I think you can do better next time";
-
-        }
-        else {
-          text_new = "Your score is " + student_point_final + "/22" +  " . Excellent job, I'm proud of you, your mother proud of you, your bros proud of you, everyone proud of you";
-        }
-        this.textToSpeech(text_new);
-
-        this.setState({
-          text: text_new,
-          right_test_result: right_test_result,
-          wrong_test_result: wrong_test_result,
-          pronunce_test_result: pronunce_test_result
-        });
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
 
   onStop= (blobObject) => {
     console.log('recordedBlob is: ', blobObject);
-    if (this.state.status_pronunciation) {
-      this.checkPronunciation(blobObject.blob, this.pronunciation_text);
-    }
-    else {
-      this.upload_recordfile(blobObject.blob, this.session_id, this.state.current_question);
-    }
+    this.checkPronunciation(blobObject.blob, this.pronunciation_text);
   };
 
   next_question_click = () => {
@@ -624,14 +525,7 @@ class Layout extends React.PureComponent {
     }
     else {
       this.send(this.state.next_test_quesion);
-      this.setState({
-        status_drag: false,
-        hidepicture: false,
-        drag_finish: false,
-        move_count: 0,
-        student_move: false,
-        end_drag: false
-      });
+
     }
 
 
@@ -644,11 +538,8 @@ class Layout extends React.PureComponent {
       return (
         <div className="col-md-7 text-center">
           <h2 className="text-white">{this.state.text}</h2>
-          <div>
-            {this._result_table_render()}
-          </div>
           <p className="mb-2">
-            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 550 }} />
+            <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 650 }} />
           </p>
         </div>
       );
@@ -674,9 +565,6 @@ class Layout extends React.PureComponent {
           <button hidden={this.state.speech_status == "Stop Listening"}>
             <img src={'https://upload.wikimedia.org/wikipedia/commons/0/06/Mic-Animation.gif'} alt="" style={{ width: 50 }} />
           </button>
-          <button hidden={!this.state.checking_pronun}>
-            <img src={'https://www.voya.ie/Interface/Icons/LoadingBasketContents.gif'} alt="" style={{ width: 50 }} />
-          </button>
         </div>
       </div>
 
@@ -701,12 +589,6 @@ class Layout extends React.PureComponent {
         <button disabled={!this.state.artyomActive} onClick={this.stopAssistant}>
           <img src={'https://www.freeiconspng.com/minicovers/microfono-microphone-icon-coloring-book-colouring-xanthochroi---2.png'} alt="" style={{ width: 50 }} />
         </button>
-        <div>
-          <button onClick={this.next_question_click}>
-            <text>Please click it when the test is frozen</text>
-            <img src={'https://thumbs.gfycat.com/WellinformedRealisticConch-small.gif'} alt="" style={{ width: 50 }} />
-          </button>
-        </div>
         {/*<input type="button" value="Microphone Off" disabled={this.state.artyomActive} onClick={this.startAssistant} />*/}
         {/*<input type="button" value="Microphone On" disabled={!this.state.artyomActive} onClick={this.stopAssistant}/>*/}
         <div className="hidden" style={divStyle} hidden>
@@ -717,9 +599,10 @@ class Layout extends React.PureComponent {
           <button onClick={this.startRecording} type="button">Start</button>
           <button onClick={this.stopRecording} type="button">Stop</button>
         </div>
+        <button onClick={this.next_question_click}>
+          <img src={'http://icons.iconarchive.com/icons/visualpharm/must-have/256/Next-icon.png'} alt="" style={{ width: 50 }} />
+        </button>
       </div>
-
-
     )
   }
 
@@ -732,19 +615,13 @@ class Layout extends React.PureComponent {
 
   }
 
-  studen_reset_move(dataFromChild) {
-    // log our state before and after we updated it
-    this.setState({
-      reset_move: dataFromChild
-    });
-    console.log("reset move from child   " + this.state.reset_move)
-  }
-
   studen_move_answerHanlder(location_data) {
     // log our state before and after we updated it
     this.setState({
       student_move: location_data
     });
+
+    this.stopAssistant();
 
     if(this.state.move_count == 1) {
       if(this.state.student_move){
@@ -752,10 +629,9 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          drag_finish: true,
-          reset_move: true
+          end_drag: true
         });
-        this.drag_textToSpeech(text_new);
+        this.textToSpeech(text_new);
 
       }
       else{
@@ -764,7 +640,7 @@ class Layout extends React.PureComponent {
           text: text_new,
           on_dragging: true
         });
-        this.drag_textToSpeech(text_new)
+        this.textToSpeech(text_new)
       }
     }
     if(this.state.move_count == 2) {
@@ -773,10 +649,9 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          drag_finish: true,
-          reset_move: true
+          end_drag: true
         });
-        this.drag_textToSpeech(text_new);
+        this.textToSpeech(text_new);
 
       }
       else{
@@ -785,7 +660,7 @@ class Layout extends React.PureComponent {
           text: text_new,
           on_dragging: true
         });
-        this.drag_textToSpeech(text_new)
+        this.textToSpeech(text_new)
       }
     }
     if(this.state.move_count == 3) {
@@ -794,47 +669,28 @@ class Layout extends React.PureComponent {
         this.setState({
           text: text_new,
           on_dragging: false,
-          drag_finish: true,
-          reset_move: true
+          end_drag: true
         });
-        this.drag_textToSpeech(text_new);
+        this.textToSpeech(text_new);
 
       }
       else{
-        let text_new = "Oops, still wrong, try next time, now let move to the new question";
+        let text_new = "Oops, still wrong, let try it next time";
         this.setState({
           text: text_new,
           on_dragging: false,
-          drag_finish: true,
-          reset_move: true,
+          end_drag: true
         });
-        this.drag_textToSpeech(text_new);
+        this.textToSpeech(text_new);
 
       }
-
-      this.stopAssistant();
-
-    }
-
-    if(this.state.student_move){
-      this.postData('https://topkid.tradersupport.club:8443/add/speaking_test_kidtopi', {
-        question_id: this.current_question,
-        session_id: this.session_id,
-        answer: 'right',
-        point: 1,
-        test_level: 'starter',
-        date: today,
-        time: time,
-        student_answer: 'drag n drop question'
-      })
-        .then(data => {
-        }) // JSON-string from `response.json()` call
-        .catch(error => console.error(error));
     }
 
     this.setState({
-      drag_finish: this.state.drag_finish
+      drag_finish: this.state.end_drag
     });
+
+    console.log(this.state.drag_finish)
 
   }
 
@@ -847,43 +703,15 @@ class Layout extends React.PureComponent {
           <Container
             background_img = {this.state.background_img}
             object_img={this.state.object_img}
-            reset_move = {this.state.reset_move}
             left_larger={this.state.left_larger}
             left_smaller={this.state.left_smaller}
             top_larger={this.state.top_larger}
             top_smaller={this.state.top_smaller}
             action={this.move_counterHanlder}
             action2={this.studen_move_answerHanlder}
-            action3={this.studen_reset_move}
 
           />
         </DragDropContextProvider>
-      </div>
-    )
-  }
-
-
-  _result_table_render() {
-    return (
-      <div hidden={!this.state.show_result_table}>
-        <MDBTable>
-          <MDBTableHead>
-            <tr>
-              <th>Right</th>
-              <th>{this.state.right_test_result}</th>
-            </tr>
-          </MDBTableHead>
-          <MDBTableBody>
-            <tr>
-              <td>Wrong</td>
-              <th>{this.state.wrong_test_result}</th>
-            </tr>
-            <tr>
-              <td>Pronunce</td>
-              <th>{this.state.pronunce_test_result}</th>
-            </tr>
-          </MDBTableBody>
-        </MDBTable>
       </div>
     )
   }
@@ -895,7 +723,6 @@ class Layout extends React.PureComponent {
       <div className="finishHomeWorkWrap py-5 d-flex justify-content-center align-items-center flex-column">
         <div className="fz-50 text-white font-weight-bold mb-4">Kidtopi Speaking Test</div>
         {this._dragrender()}
-
 
         <div className="typeTwentySeven w-100">
           <div className="container">

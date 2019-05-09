@@ -12,8 +12,11 @@ class BaseLayer extends React.Component {
     num_not_do= 0
     trigger_not_do = 'trigger_not_do';
     trigger_confirm = 'trigger_confirm';
+    trigger_ready = 'trigger_ready';
     session_id = uuid.v4();
     status_wait = false;
+    status_listening = false;
+    text_next = "It's already 30 seconds and you haven't done anything. I will move to the next question.";
     postData(url = '', data, type='json') {
         if (type == 'json'){
             return fetch(url, {
@@ -70,16 +73,23 @@ class BaseLayer extends React.Component {
           }
           if (data.components[component].name == 'PAYLOAD') {
             if (data.components[component].content.fields.hasOwnProperty('trigger_confirm')){
-              let result = data.components[component].content.fields.trigger_confirm.stringValue;
-              if (result == 'true'){
+              if (data.components[component].content.fields.trigger_confirm.stringValue == 'true'){
                 this.nextQuestion();
               }
-              if (result == 'false'){
+              if (data.components[component].content.fields.trigger_confirm.stringValue == 'false'){
                   this.stopAssistant();
                   this.num_not_do = 0;
                   this.status_wait = true;
                   this.wait();
               }
+            }
+            if (data.components[component].content.fields.hasOwnProperty('trigger_status_listening')){
+                if (data.components[component].content.fields.trigger_status_listening.stringValue == 'true'){
+                    this.status_listening = true;
+                }
+                if (data.components[component].content.fields.trigger_status_listening.stringValue == 'false'){
+                    this.status_listening = false;
+                }
             }
           }
         }
@@ -87,6 +97,7 @@ class BaseLayer extends React.Component {
     }
 
     setDefault(){
+        this.stopAssistant();
         this.status_wait = false;
         this.num_not_do = 0;
     }
@@ -96,8 +107,7 @@ class BaseLayer extends React.Component {
             if (this.status_wait){
                 console.log(this.num_not_do)
                 if (this.num_not_do >= 3){
-                    let text_next = "It's already 30 seconds and you haven't done anything. I will move to the next question."
-                    this.textToSpeech(text_next);
+                    this.textToSpeech(this.text_next);
                 }
                 else {
                     this.send(this.trigger_not_do);
@@ -114,11 +124,14 @@ class BaseLayer extends React.Component {
     }
 
     textToSpeech(text) {
+        if (text.includes('reading and writing section')){
+            this.send(this.trigger_ready);
+        }
         this.stopAssistant();
         let speech = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(speech);
         speech.onend = () => {
-            if (text == 'Are you sure?' || text == "I don't understand. Please say again."){
+            if (this.status_listening){
                 this.status_wait = false;
                 this.startAssistant();                
             }
@@ -126,9 +139,10 @@ class BaseLayer extends React.Component {
                 this.status_wait = true;
                 this.wait();
             }
-            if (text == "It's already 30 seconds and you haven't done anything. I will move to the next question."){
+            if (text == this.text_next){
                 this.nextQuestion();
             }
+            this.status_listening = false;
         };
     }
 

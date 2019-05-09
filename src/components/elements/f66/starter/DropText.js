@@ -37,6 +37,7 @@ class StarterSeven extends BaseLayer {
 
     randomAnswer = () => {
         console.log(7);
+        this.textToSpeech(this.props.q_text);
         this.status_wait = true;
         this.wait();
         let correctAnswer = '';

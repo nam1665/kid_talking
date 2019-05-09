@@ -111,6 +111,7 @@ class StarterEight extends BaseLayer {
         if (this.inputText) {
             this.inputText.focus();
         }
+        // this.textToSpeech(this.props.q_text);
         this.status_wait = true;
         this.wait(30000);
     }
