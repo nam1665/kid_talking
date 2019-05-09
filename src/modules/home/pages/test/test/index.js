@@ -32,22 +32,12 @@ class TestLayout extends React.Component {
             });
 
             if (data.result && data.result.course_id && data.result.lesson_id) {
-
-                let _lessionId = data.result.lesson_id;
-                let _courseId = data.result.course_id;
-                if (Storage.get('kidUserId') == 964){
-                    _lessionId = 446;
-                    _courseId = 77;
-                }
-                if (Storage.get('kidUserId') == 963){
-                    _lessionId = 451;
-                    _courseId = 78;
-                }
-                
                 const questions = await Request.get('', {
                     wsfunction: 'local_get_questions_external',
-                    lessionId: _lessionId,
-                    courseId: _courseId
+                    lessionId: data.result.lesson_id,
+                    courseId: data.result.course_id
+                    // lessionId: 180,
+                    // courseId: 55
                 });
 
                 if (questions.result.quiz_id) {

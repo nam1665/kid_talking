@@ -2,13 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import DefaultLayout from '../../DefaultLayout';
 
-import BaseLayer from './Base.js'
-// import uuid from "uuid";
-// import Artyom from 'artyom.js';
-// import ArtyomCommandsManager from 'src/helpers/ArtyomCommands';
-
-
-class StarterFive extends BaseLayer {
+class StarterFive extends React.Component {
     state = {
         data: {
             q: 'There are shoes',
@@ -19,36 +13,7 @@ class StarterFive extends BaseLayer {
         checked: null
     };
 
-    nextQuestion(){
-        this.setDefault();
-        let res = {};
-
-        if (this.props.isExample) {
-            res = {
-                answer: ['example'],
-                correct: false,
-                fraction: 0
-            };
-        } else {
-            if (this.state.checked != null) {
-                res = {
-                    answer: [this.state.checked],
-                    correct: Number(this.props.data[this.state.checked].fraction) == 1,
-                    fraction: Number(this.props.data[this.state.checked].fraction)
-                };
-            } else {
-                res = {
-                    answer: [''],
-                    correct: false,
-                    fraction: 0
-                };
-            }
-        }
-        this.props.onNext(res)
-    }
-
     componentDidMount() {
-        console.log(1);
         if (this.props.isExample) {
             this.timeout = setTimeout(() => {
                 if (this.falseBtn) {
@@ -56,11 +21,6 @@ class StarterFive extends BaseLayer {
                 }
             }, 1000);
         }
-        // this.textToSpeech(this.props.q_text);
-        // console.log(this.props.q_text)
-        this.status_wait = true;
-        this.wait();
-
     }
 
     componentWillUnmount() {
@@ -97,7 +57,6 @@ class StarterFive extends BaseLayer {
                         this.setState({
                             checked: 0
                         });
-                        this.send(this.trigger_confirm);
                     }}
                 >
                     True
@@ -108,7 +67,6 @@ class StarterFive extends BaseLayer {
                         this.setState({
                             checked: 1
                         });
-                        this.send(this.trigger_confirm);                        
                     }}
                 >
                     False
@@ -128,13 +86,36 @@ class StarterFive extends BaseLayer {
                     .replace('x: False', '<img width="60" height="60" src="/images/homework/test-13/false.png" />')
                     .trim()}`}
                 onNext={() => {
-                    this.nextQuestion();
+                    let res = {};
+
+                    if (isExample) {
+                        res = {
+                            answer: ['example'],
+                            correct: false,
+                            fraction: 0
+                        };
+                    } else {
+                        if (this.state.checked != null) {
+                            res = {
+                                answer: [this.state.checked],
+                                correct: Number(data[this.state.checked].fraction) == 1,
+                                fraction: Number(data[this.state.checked].fraction)
+                            };
+                        } else {
+                            res = {
+                                answer: [''],
+                                correct: false,
+                                fraction: 0
+                            };
+                        }
+                    }
+
+                    onNext(res);
                 }}
             >
                 <div className="typeTwentySeven w-100">
                     <div className="container">
                         <div className="row justify-content-center">{this.renderQuestion()}</div>
-                        {this._javisrender()}
                     </div>
                 </div>
             </DefaultLayout>

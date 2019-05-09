@@ -4,9 +4,8 @@ import DefaultLayout from '../../DefaultLayout';
 import _ from 'lodash';
 import Droppable from 'src/components/Droppable/index';
 import Draggable from 'src/components/Draggable/index';
-import BaseLayer from './Base.js'
 
-class StarterSeven extends BaseLayer {
+class StarterSeven extends React.Component {
     state = {
         dataAnswers: [],
         currentItem: null,
@@ -36,10 +35,6 @@ class StarterSeven extends BaseLayer {
     }
 
     randomAnswer = () => {
-        console.log(7);
-        this.textToSpeech(this.props.q_text);
-        this.status_wait = true;
-        this.wait();
         let correctAnswer = '';
         this.props.data.map(o => {
             correctAnswer += o.text;
@@ -97,32 +92,7 @@ class StarterSeven extends BaseLayer {
             dataAnswers
         });
     }
-    nextQuestion(){
-        this.setDefault();
-        const { dataAnswers, rawAnswers } = this.state;
 
-        const trueAnswer = _.clone(rawAnswers)
-            .map(o => o.text)
-            .join('');
-        const dataAns = _.clone(dataAnswers)
-            .map(o => {
-                if (o && o.text) {
-                    return o.text;
-                }
-
-                return '';
-            })
-            .join('');
-
-        const correct = trueAnswer === dataAns;
-
-        if (this.props.onNext)
-            this.props.onNext({
-                answer: dataAnswers.map(item => item.group),
-                correct,
-                fraction: correct ? 1 : 0
-            });
-    }
     onDrop(group) {
         let { dataAnswers, answers, currentItem } = this.state;
 
@@ -218,24 +188,6 @@ class StarterSeven extends BaseLayer {
             currentItem: null,
             correct
         });
-        const trueAnswer = _.clone(this.state.rawAnswers)
-            .map(o => o.text)
-            .join('');
-        const dataAns = _.clone(this.state.dataAnswers)
-            .map(o => {
-                if (o && o.text) {
-                    return o.text;
-                }
-
-                return '';
-            })
-            .join('');
-
-        if (trueAnswer.length == dataAns.length) {
-            this.send(this.trigger_confirm);
-            // viet vao day
-        }
-
     }
 
     _sort(data) {
@@ -266,7 +218,29 @@ class StarterSeven extends BaseLayer {
                 {...other}
                 title={'Look at the pictures. Look at the letters. Write the words'}
                 onNext={() => {
-                    this.nextQuestion();
+                    const { dataAnswers, rawAnswers } = this.state;
+
+                    const trueAnswer = _.clone(rawAnswers)
+                        .map(o => o.text)
+                        .join('');
+                    const dataAns = _.clone(dataAnswers)
+                        .map(o => {
+                            if (o && o.text) {
+                                return o.text;
+                            }
+
+                            return '';
+                        })
+                        .join('');
+
+                    const correct = trueAnswer === dataAns;
+
+                    if (onNext)
+                        onNext({
+                            answer: dataAnswers.map(item => item.group),
+                            correct,
+                            fraction: correct ? 1 : 0
+                        });
                 }}
             >
                 <div className="typeSeventeen w-100">
@@ -277,7 +251,6 @@ class StarterSeven extends BaseLayer {
                                     <div className="text-center mb-5 mt-5">
                                         <img src={q_picture} alt="" style={{ width: 300 }} />
                                     </div>
-                                    {this._javisrender()} 
                                     <div className="row justify-content-center mb-5 text-center">
                                         <div className={`col-${7 + answers.length - 4}`}>
                                             <div className="row justify-content-center">

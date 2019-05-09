@@ -6,7 +6,6 @@ import style from './style.module.css';
 
 class Example extends React.PureComponent {
     componentDidMount() {
-        console.log("video 1231")
         if (this.videoRef && this.props.q_video) {
             if (Hls.isSupported() && this.props.q_video.indexOf('m3u8') > -1) {
                 if (this.videoRef.canPlayType('application/vnd.apple.mpegurl')) {

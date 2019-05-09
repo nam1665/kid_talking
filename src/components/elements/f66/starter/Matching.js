@@ -3,9 +3,8 @@ import DefaultLayout from '../../DefaultLayout';
 import _ from 'lodash';
 import Draggable from 'src/components/Draggable';
 import Droppable from 'src/components/Droppable';
-import BaseLayer from './Base.js'
 
-class StarterOne extends BaseLayer {
+class StarterOne extends React.Component {
     state = {
         answers: [
             {
@@ -85,31 +84,7 @@ class StarterOne extends BaseLayer {
             });
         }
     }
-    nextQuestion(){
-        this.setDefault();
-        let correct = true;
-        let point = 5;
 
-        const answer = [];
-
-        _.forEach(this.state.answers, o => {
-            if (o.t && o.t > -1) {
-                if (o.t != o.answer) {
-                    correct = false;
-                    point = point - 1;
-                    answer.push(`${o.name}:${o.answer}:false`);
-                } else {
-                    answer.push(`${o.name}:${o.answer}:true`);
-                }
-            }
-        });
-
-        this.props.onNext({
-            answer: answer,
-            correct: correct,
-            fraction: point
-        });
-    }
     componentDidMount() {
         this.timeout = setTimeout(() => {
             const elem = this.connection[2];
@@ -126,11 +101,6 @@ class StarterOne extends BaseLayer {
                 elem.setAttribute('y2', bounceDrag.top + bounceDrag.height / 2);
             }
         }, 100);
-        console.log(3);
-
-        // this.textToSpeech(this.props.q_text);
-        this.status_wait = true;
-        this.wait(300000);
     }
 
     componentWillUnmount() {
@@ -238,11 +208,6 @@ class StarterOne extends BaseLayer {
             answers,
             isDroping: true
         });
-
-        if (this.state.answers.filter(o => o.answer).length == this.state.totalSound) {
-            this.send(this.trigger_confirm);
-        }
-
     }
 
     renderDraggable(answer, index) {
@@ -353,7 +318,28 @@ class StarterOne extends BaseLayer {
                     });
                 }}
                 onNext={() => {
-                    this.nextQuestion();
+                    let correct = true;
+                    let point = 5;
+
+                    const answer = [];
+
+                    _.forEach(answers, o => {
+                        if (o.t && o.t > -1) {
+                            if (o.t != o.answer) {
+                                correct = false;
+                                point = point - 1;
+                                answer.push(`${o.name}:${o.answer}:false`);
+                            } else {
+                                answer.push(`${o.name}:${o.answer}:true`);
+                            }
+                        }
+                    });
+
+                    onNext({
+                        answer: answer,
+                        correct: correct,
+                        fraction: point
+                    });
                 }}
             >
                 <div className="typeFifteen w-100">
@@ -364,7 +350,6 @@ class StarterOne extends BaseLayer {
                                     className="image-wrap ml-auto mr-auto noselect"
                                     style={{ width: 400, height: 480 }}
                                 >
-                                    {this._javisrender()}   
                                     <img
                                         src={q_picture}
                                         style={{ width: 450 }}
