@@ -269,7 +269,7 @@ class Layout extends React.PureComponent {
 
 
   pronun_textToSpeech(pronun_text) {
-    let speech = new SpeechSynthesisUtterance(pronun_text);
+    let speech = new SpeechSynthesisUtterance(pronun_tex                                                                                                           t);
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
 
