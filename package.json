@@ -52,6 +52,7 @@
         "invariant": "^2.2.4",
         "js-cookie": "^2.2.0",
         "lodash": "^4.17.11",
+        "mdbreact": "^4.13.0",
         "moment": "^2.23.0",
         "normalizr": "^3.3.0",
         "path-to-regexp": "^2.4.0",

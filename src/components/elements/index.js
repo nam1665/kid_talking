@@ -21,6 +21,7 @@ import SDropText from './f66/starter/DropText';
 import SReading from './f66/starter/Reading';
 import SExample from './f66/starter/Example';
 import SSection from './f66/starter/Section';
+import SSpeaking from './f66/starter/speaking_test';
 
 export {
     DefaultLayout,
@@ -46,5 +47,6 @@ export {
     SDropText,
     SReading,
     SExample,
-    SSection
+    SSection,
+    SSpeaking
 };

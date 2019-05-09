@@ -93,6 +93,8 @@ export const getQuestionTypes = question => {
         return 'SSection';
     } else if (/\[\[.*?\:example\]\]/g.test(question.q_title)) {
         return 'SExample';
+    } else if (/\[\[.*?\:speaking\]\]/g.test(question.q_title)) {
+        return 'SSpeaking';
     } else if (question.q_title.indexOf('ENTRANCE_TEST_STARTER_10') > -1) {
         return 'ahihi';
     } else if (question.q_title.indexOf('ENTRANCE_TEST_STARTER_1') > -1) {
