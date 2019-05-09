@@ -81,12 +81,12 @@ class Layout extends React.PureComponent {
   pronunciation_text = "";
   next_test_quesion = "";
   next_pronun_question = "";
-  current_question = "";
+  current_question = 0;
   background_img = "";
   object_img = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send(starter_triger);
+    this.send("end_of_class");
   }
 
   postData(url = '', data, type='json') {
