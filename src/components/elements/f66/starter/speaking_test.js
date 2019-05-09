@@ -663,8 +663,8 @@ class Layout extends React.PureComponent {
             {this._result_table_wrong_render()}
             <text style={{fontSize: 20, color: 'white'}}>Pronunciation</text>
             {this._result_table_pronunce_render()}
-            {/*<text style={{fontSize: 20, color: 'white'}}>Right Answers</text>*/}
-            {/*{this._result_table_right_render()}*/}
+            <text style={{fontSize: 20, color: 'white'}}>Right Answers</text>
+            {this._result_table_right_render()}
           </div>
           <p className="mb-2">
             <img hidden={this.state.hidepicture} src={this.state.image} alt="" style={{ width: 550 }} />
