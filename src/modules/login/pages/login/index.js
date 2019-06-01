@@ -608,7 +608,7 @@ class Layout extends React.PureComponent {
               // let student_wrong_list = data.wrong;
               // let student_pronunce = data.pronunce;
               let text_new = "";
-              let text_fix = "You did a greate job today, here is your result";
+              let text_fix = "You did a great job today, here is your result";
               if(student_point_final < 12 ){
                   text_new = "Your score is " + student_point_final + "/22" + " . Your result is not good, but don't worry, let's practice more, it will be better";
               }
