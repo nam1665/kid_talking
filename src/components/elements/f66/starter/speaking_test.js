@@ -125,6 +125,7 @@ class Layout extends React.PureComponent {
       status_pronunciation: false,
       status_change_question: false
     });
+    console.log(this.props.q_picture);
     this.postData(this.props.q_picture, {
       q: q,
       session_id: this.session_id,
