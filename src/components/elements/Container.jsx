@@ -121,6 +121,8 @@ class Container extends React.Component {
       }),
     );
 
+    console.log("left: " + left + "  top:  " + top);
+
 
     if (left > this.state.left_larger && left < this.state.left_smaller){
       if(top > this.state.top_larger && top < this.state.top_smaller){

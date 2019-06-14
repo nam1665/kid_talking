@@ -90,7 +90,7 @@ class Layout extends React.PureComponent {
   test_answer = "";
   componentDidMount() {
     this.stopAssistant();
-    this.send(pronun_start);
+    this.send(starter_triger);
   }
 
   postData(url = '', data, type='json') {
@@ -124,7 +124,7 @@ class Layout extends React.PureComponent {
       status_pronunciation: false,
       status_change_question: false
     });
-    this.postData('https://ai.kidtopi.com/gateway/?format=true', {
+    this.postData(this.props.q_picture, {
       q: q,
       session_id: this.session_id,
       lang: 'en'
