@@ -236,10 +236,10 @@
                 margin-left: -1px;
             }
 
-            &.exam {
+            &.exam-0 {
                 animation: cardUp 10s linear 1s infinite alternate;
                 text-align: center;
-                left: 25px;
+                left: 0px;
 
                 .title {
                     font-size: 24px;
@@ -264,7 +264,146 @@
                     padding: 0 30px;
                 }
             }
+            &.exam-1 {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 330px;
 
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+            &.exam-2 {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 660px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+            &.exam-3 {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 990px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+            &.exam-4 {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 1320px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
+            &.exam-5 {
+                animation: cardUp 10s linear 1s infinite alternate;
+                text-align: center;
+                left: 1650px;
+
+                .title {
+                    font-size: 24px;
+                    position: relative;
+                    top: 28px;
+                    font-weight: bold;
+                    color: #772500;
+                    padding: 0 40px;
+                }
+
+                img {
+                    height: 260px;
+                    top: 5px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .button-wrap {
+                    position: absolute;
+                    bottom: 40px;
+                    width: 100%;
+                    padding: 0 30px;
+                }
+            }
             &.unit {
                 animation: cardDown 10s linear 1s infinite alternate;
                 text-align: center;
@@ -330,7 +469,6 @@
                 // }
             }
         }
-
         .lesson_copy {
             position: absolute;
             z-index: 3;

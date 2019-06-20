@@ -29,6 +29,7 @@ class HomeWork extends React.Component {
     }
 
     async componentDidMount() {
+        console.log(this.props)
         const questions = await Request.get('', {
             wsfunction: 'local_get_questions_external',
             lessionId: this.props.location.query.lesson,

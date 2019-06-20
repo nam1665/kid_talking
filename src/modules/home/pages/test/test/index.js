@@ -25,29 +25,18 @@ class TestLayout extends React.Component {
     }
 
     async UNSAFE_componentWillMount() {
+        console.log(this.props)
         try {
-            const data = await Request.get('', {
-                wsfunction: 'local_get_level_kid_after_test',
-                userid: Storage.get('kidUserId')
-            });
-
-            if (data.result && data.result.course_id && data.result.lesson_id) {
-
-                let _lessionId = data.result.lesson_id;
-                let _courseId = data.result.course_id;
-                if (Storage.get('kidUserId') == 964){
-                    _lessionId = 446;
-                    _courseId = 77;
-                }
-                if (Storage.get('kidUserId') == 963){
-                    _lessionId = 451;
-                    _courseId = 78;
-                }
-                
+            // const data = await Request.get('', {
+            //     wsfunction: 'local_get_level_kid_after_test',
+            //     userid: Storage.get('kidUserId')
+            // });
+            
+            // if (data.result && data.result.course_id && data.result.lesson_id) {
                 const questions = await Request.get('', {
                     wsfunction: 'local_get_questions_external',
-                    lessionId: _lessionId,
-                    courseId: _courseId
+                    lessionId: this.props.location.query.lesson,
+                    courseId: this.props.location.query.course
                 });
 
                 if (questions.result.quiz_id) {
@@ -64,6 +53,7 @@ class TestLayout extends React.Component {
                         resAttempt.result.forEach(attempt => (this.attempt[attempt.question_id] = attempt));
                     }
                 }
+                console.log(questions)
 
                 this.setState({
                     quiz_id: questions.result.quiz_id,
@@ -106,7 +96,7 @@ class TestLayout extends React.Component {
                         }),
                     loading: false
                 });
-            }
+            // }
         } catch (e) {
             alert(e.message);
         }

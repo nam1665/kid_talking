@@ -39,6 +39,7 @@ function* authorize(credentials = {}, meta = {}) {
             type: actionTypes.ACCOUNT_LOGIN_SUCCESS,
             payload: res
         });
+        yield call(watchGetCourse, res.result.token);
         yield call(watchGetMe, res.result.token);
         yield call(watchGetStatus, res.result.token);
         yield call(watchGetTrialCourses);
@@ -126,6 +127,26 @@ export function* watchGetStatus(token) {
     }
 }
 
+export function* watchGetCourse(token) {
+    if (Storage.getAccessToken() || token) {
+        try {
+            const data = yield Request.get('', {
+                wsfunction: 'local_get_course_lession_external',
+                unitid: Storage.get('kidCourceId')
+            });
+
+            yield put({
+                type: actionTypes.ACCOUNT_REQUEST_COURSE_LESSION_EXTERNAL_SUCCESS,
+                payload: data.result
+            });
+        } catch (e) {
+            yield put({
+                type: actionTypes.ACCOUNT_REQUEST_COURSE_LESSION_EXTERNAL_FAIL,
+                payload: e
+            });
+        }
+    }
+}
 export function* watchGetTrialCourses() {
     if (Storage.getAccessToken()) {
         try {

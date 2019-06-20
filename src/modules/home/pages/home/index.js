@@ -41,26 +41,36 @@ class HomePage extends React.Component {
         });
     }
 
+    _get_link(course){
+        return Route.test + "?lesson=" + course.id + "&course=" + course.course
+    }
     _renderTestItem() {
-        const { userState } = this.props;
-        return (
-            <div className="lesson exam">
+        const {course_lession} = this.props;
+        console.log(this.props)
+
+        let listItems = course_lession.map((course, i) =>
+            <div className={`lesson exam-${i}`} key={i}>
                 <div className="lesson-inner">
-                    <div className="title">Kiểm tra Tiếng Anh</div>
+                    <div className="title">{"Starter Quiz " + (i+1)}</div>
 
                     <div className="content">
                         <img src="/images/bobi.png" alt="" />
 
                         <div className="button-wrap">
-                            <Link to={Route.test} className="btn-3d btn-violet btn-rounded-20 fz-18 w-100 p-2 ">
-                                {userState > 1 ? 'Kết quả kiểm tra' : 'Bắt đầu kiểm tra'}
+                            <Link to={this._get_link(course)} className="btn-3d btn-violet btn-rounded-20 fz-18 w-100 p-2 ">
+                            {/* <Link to={Route.test(course.id)} className="btn-3d btn-violet btn-rounded-20 fz-18 w-100 p-2 "> */}
+                            Bắt đầu kiểm tra
+                                {/* {userState > 1 ? 'Kết quả kiểm tra' : 'Bắt đầu kiểm tra'} */}
                             </Link>
                         </div>
                     </div>
                 </div>
-
             </div>
-
+        );
+        return (
+                <div>
+                    {listItems}
+                </div>
 
         );
     }
@@ -228,14 +238,17 @@ HomePage.propTypes = {
     userInfo: PropTypes.object,
     userState: PropTypes.number,
     trialCourse: PropTypes.any,
-    userSignout: PropTypes.func
+    userSignout: PropTypes.func,
+    course_lession: PropTypes.array
+
 };
 
 const mapStateToProps = state => {
     return {
         userInfo: userSelector(state),
         userState: state.auth.userState,
-        trialCourse: state.auth.trialCourse
+        trialCourse: state.auth.trialCourse,
+        course_lession: state.auth.course_lession
     };
 };
 
