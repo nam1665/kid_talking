@@ -46,9 +46,10 @@ class HomePage extends React.Component {
     }
     _renderTestItem() {
         const {course_lession} = this.props;
-        console.log(this.props)
+        let list_course = course_lession.slice(0, 6);
+        console.log(list_course)
 
-        let listItems = course_lession.map((course, i) =>
+        let listItems = list_course.map((course, i) =>
             <div className={`lesson exam-${i}`} key={i}>
                 <div className="lesson-inner">
                     <div className="title">{"Starter Quiz " + (i+1)}</div>
