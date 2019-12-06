@@ -78,7 +78,7 @@
         "redux-saga": "^0.16.2",
         "redux-thunk": "^2.3.0",
         "reselect": "^4.0.0",
-        "serialize-javascript": "^1.6.1",
+        "serialize-javascript": "^2.1.1",
         "speak-tts": "^2.0.8",
         "ts-react-json-table": "^0.1.1",
         "url": "^0.11.0",
